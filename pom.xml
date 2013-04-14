@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>craftsmanship-at-capgemini</groupId>
+        <artifactId>common-build</artifactId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>parent-pom.xml</relativePath>
+    </parent>
+    <artifactId>clean-javaee</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>clean-javaee complete domain</name>
+    <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/craftsmanship-at-capgemini/clean-javaee/issues</url>
+    </issueManagement>
+    <scm>
+        <connection>https://github.com/craftsmanship-at-capgemini/clean-javaee.git</connection>
+        <developerConnection>scm:git:git@github.com:craftsmanship-at-capgemini/clean-javaee.git</developerConnection>
+        <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
+        <tag>HEAD</tag>
+    </scm>
+    <organization/>
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+            <comments>A free of charge, business-friendly, open-source software license</comments>
+        </license>
+    </licenses>
+    <inceptionYear>2012</inceptionYear>
+    <developers>
+        <developer>
+            <id>1</id>
+            <name>Michal Michaluk</name>
+            <timezone>2</timezone>
+        </developer>
+    </developers>
+  <modules>
+    <module>clean-javaee-api</module>
+    <module>clean-javaee-spi</module>
+    <module>clean-javaee-domain</module>
+    <module>clean-javaee-web</module>
+    <module>clean-javaee-ear</module>
+  </modules>
+</project>
