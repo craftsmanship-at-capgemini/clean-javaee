@@ -1,9 +1,4 @@
 
-## custom
-/forks/
-/build-tools/
-/clean-javaee/
-
 ## maven
 target/
 target-test/
@@ -91,4 +86,3 @@ tramp
 Session.vim
 .netrwhist
 *~
-
