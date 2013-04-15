@@ -35,4 +35,14 @@ public class OrderRepository {
                 "select o from OrderEntity o where o.customer.customerKey = :customerKey",
                 QueryParamBuilder.withParam("customerKey", customerKey));
     }
+    
+    public void deleteClosedOrders() {
+        entityManager.createQuery("delete from OrderLineEntity ol where ol.order.orderState = :state").
+                setParameter("state", OrderState.CLOSED).
+                executeUpdate();
+        entityManager.createQuery("delete from OrderEntity o where o.orderState = :state").
+                setParameter("state", OrderState.CLOSED).
+                executeUpdate();
+    }
+    
 }
