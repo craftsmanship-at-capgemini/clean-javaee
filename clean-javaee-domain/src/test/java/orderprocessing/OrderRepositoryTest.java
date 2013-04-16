@@ -71,7 +71,6 @@ public class OrderRepositoryTest {
         
         assertThat(actual).
                 isLenientEqualsToByIgnoringFields(expected);
-        
     }
     
     @Test
@@ -144,7 +143,7 @@ public class OrderRepositoryTest {
         
         List<OrderEntity> actual = orderRepository.findOrdersOfCustomer(customerKey);
         
-        // ignores order or records but use equals!
+        // ignores order of records but use equals!
         assertThat(actual).
                 containsOnly(expected1, expected2);
     }
@@ -179,7 +178,9 @@ public class OrderRepositoryTest {
     
     @Test
     public void shouldWorksWithoutErrorWhenNoOrdersInSystem() {
+        persistenceUnit.begin();
         orderRepository.deleteClosedOrders();
+        persistenceUnit.commit();
     }
     
     @Test
@@ -190,7 +191,9 @@ public class OrderRepositoryTest {
                 withOrderState(OrderState.PROCESSED).build();
         persistenceUnit.persist(expected1, expected2);
         
+        persistenceUnit.begin();
         orderRepository.deleteClosedOrders();
+        persistenceUnit.commit();
         
         OrderEntity o = alias(OrderEntity.class, "o");
         @SuppressWarnings("unchecked")//
@@ -213,6 +216,7 @@ public class OrderRepositoryTest {
                 withOrderState(OrderState.CLOSED).build();
         persistenceUnit.persist(toDelete1, expected, toDelete2);
         
+        persistenceUnit.begin();
         orderRepository.deleteClosedOrders();
         persistenceUnit.commit();
         
