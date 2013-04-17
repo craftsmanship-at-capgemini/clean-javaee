@@ -227,47 +227,10 @@
     </profiles>
     <repositories>
         <repository>
-            <id>internal</id>
-            <name>Internal Repository</name>
-            <url>http://localhost:8083/archiva/repository/internal/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>http://localhost:8083/archiva/repository/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>EclipseLink</id>
             <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
         </repository>
     </repositories>
-    <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <name>Internal maven repository with release versions</name>
-            <url>${repository.internal}</url>
-            <layout>default</layout>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Internal maven repository with snapshot versions</name>
-            <url>${repository.snapshots}</url>
-            <layout>default</layout>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
     <pluginRepositories>
         <pluginRepository>
             <id>Codehaus repository</id>

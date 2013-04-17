@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -26,7 +27,7 @@ import customermanagement.CustomerKey;
 public class CustomerEntity implements Serializable {
     
     private static final long serialVersionUID = -1659473037158650337L;
-    @Id @GeneratedValue protected long id;
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) protected long id;
     @Version protected int version;
     
     @Embedded @NotNull @Valid protected CustomerKey customerKey;

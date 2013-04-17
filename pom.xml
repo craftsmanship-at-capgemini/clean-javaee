@@ -10,7 +10,14 @@
     <artifactId>clean-javaee</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>clean-javaee complete domain</name>
+    <name>Example of clean &amp; testable Java EE application</name>
+    <modules>
+        <module>clean-javaee-api</module>
+        <module>clean-javaee-spi</module>
+        <module>clean-javaee-domain</module>
+        <module>clean-javaee-web</module>
+        <module>clean-javaee-ear</module>
+    </modules>
     <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
     <issueManagement>
         <system>GitHub Issues</system>
@@ -22,7 +29,29 @@
         <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
         <tag>HEAD</tag>
     </scm>
-    <organization/>
+    <repositories>
+        <repository>
+            <id>github-releases</id>
+            <url>https://github.com/craftsmanship-at-capgemini/maven-repo/raw/master/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>github-snapshots</id>
+            <url>https://github.com/craftsmanship-at-capgemini/maven-repo/raw/master/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <organization />
     <licenses>
         <license>
             <name>The MIT License</name>
@@ -39,11 +68,4 @@
             <timezone>2</timezone>
         </developer>
     </developers>
-  <modules>
-    <module>clean-javaee-api</module>
-    <module>clean-javaee-spi</module>
-    <module>clean-javaee-domain</module>
-    <module>clean-javaee-web</module>
-    <module>clean-javaee-ear</module>
-  </modules>
 </project>
