@@ -15,7 +15,7 @@ public class ItemKey implements Serializable {
     
     private static final long serialVersionUID = -3565100156471149574L;
     
-    @Size(min = 10, max = 10) @Column(length = 10) private String itemKey;
+    @Size(max = 100) @Column(length = 100) private String itemKey;
     
     public ItemKey(String itemKey) {
         this.itemKey = itemKey;
