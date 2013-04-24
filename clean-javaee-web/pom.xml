@@ -47,5 +47,11 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <!-- PrimeFaces projects dependency -->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>3.5</version>
+        </dependency>
     </dependencies>
 </project>
