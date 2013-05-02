@@ -8,4 +8,7 @@ Some other maven plugins (m2e, m2e-wtp) can not work well with WTP projects.
 
 # NetBeans setup
 Project works out of the box with last NetBeans Java EE.
+but be aware of https://netbeans.org/bugzilla/show_bug.cgi?id=178644
 
+# IntelliJ setup
+Project works out of the box with last IntelliJ Ultimate Edition (Free 30-day trial).
