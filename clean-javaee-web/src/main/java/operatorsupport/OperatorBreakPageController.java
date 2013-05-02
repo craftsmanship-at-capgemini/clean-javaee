@@ -12,10 +12,10 @@ import web.PageController;
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
 @PageController(view = "/operator-break")
-public class OperatorBreakePageController {
+public class OperatorBreakPageController {
     
     public static String outcome(String operator) {
-        return new Outcome(OperatorBreakePageController.class).
+        return new Outcome(OperatorBreakPageController.class).
                 setParam("operator", operator).build();
     }
     

@@ -23,7 +23,7 @@ import web.PageController;
  * <p>
  * Page allows lock, unlock and mark as done an order.
  * <p>
- * Navigation to brake page (associated with {@link OperatorBreakePageController}) is possible.
+ * Navigation to brake page (associated with {@link OperatorBreakPageController}) is possible.
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
@@ -92,7 +92,7 @@ public class OrdersListPageController {
     public String startBreak() {
         if (isOperatorCookieDefined()) {
             // e.g. log to operator performance database
-            return OperatorBreakePageController.outcome(operator);
+            return OperatorBreakPageController.outcome(operator);
         } else {
             return Outcome.stayOnPage();
         }

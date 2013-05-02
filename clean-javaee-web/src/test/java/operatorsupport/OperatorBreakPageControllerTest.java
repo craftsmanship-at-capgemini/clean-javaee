@@ -13,9 +13,10 @@ import testing.Testing;
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
-public class OperatorBreakePageControllerTest {
+public class OperatorBreakPageControllerTest {
     
-    @Inject OperatorBreakePageController controller;
+    @Inject
+    OperatorBreakPageController controller;
     
     @Before
     public void setUp() throws Exception {

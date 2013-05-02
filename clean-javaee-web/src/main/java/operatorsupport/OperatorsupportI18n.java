@@ -18,14 +18,17 @@ import javax.inject.Named;
 public class OperatorsupportI18n {
     
     private ResourceBundle bundle;
-    
+
     @Inject
     public OperatorsupportI18n(ResourceBundle bundle) {
         this.bundle = bundle;
     }
+
+    protected OperatorsupportI18n() {
+    }
     
-    public String operatorBreakePageTitle(String operator) {
-        return MessageFormat.format(bundle.getString("operatorBreakePageTitle"), operator);
+    public String operatorBreakPageTitle(String operator) {
+        return MessageFormat.format(bundle.getString("operatorBreakPageTitle"), operator);
     }
     
     public String ordersListPageTitle(String operator) {
