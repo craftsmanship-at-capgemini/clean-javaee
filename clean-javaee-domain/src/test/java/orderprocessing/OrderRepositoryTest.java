@@ -186,7 +186,7 @@ public class OrderRepositoryTest {
     @Test
     public void shouldDoNothingWhenThereIsNonClosedOrder() {
         OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderState(OrderState.ACCEPTED).build();
+                withOrderState(OrderState.SCHEDULED).build();
         OrderEntity expected2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
                 withOrderState(OrderState.PROCESSED).build();
         persistenceUnit.persist(expected1, expected2);
@@ -211,7 +211,7 @@ public class OrderRepositoryTest {
                 withOrderKey(favoriteOrderKey).
                 withOrderState(OrderState.CLOSED).build();
         OrderEntity expected = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderState(OrderState.ACCEPTED).build();
+                withOrderState(OrderState.SCHEDULED).build();
         OrderEntity toDelete2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
                 withOrderState(OrderState.CLOSED).build();
         persistenceUnit.persist(toDelete1, expected, toDelete2);
