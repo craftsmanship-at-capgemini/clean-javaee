@@ -7,6 +7,7 @@
         <class>orderprocessing.OrderEntity</class>
         <class>inventory.ItemKey</class>
         <class>orderprocessing.OrderLineEntity</class>
+        <class>orderprocessing.SequenceElementEntity</class>
         <class>orderprocessing.CustomerEntity</class>
         <class>customermanagement.CustomerKey</class>
         <properties>

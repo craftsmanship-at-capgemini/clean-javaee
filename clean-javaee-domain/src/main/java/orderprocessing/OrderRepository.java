@@ -47,20 +47,22 @@ public class OrderRepository {
     
     public List<OrderEntity> findNotDoneOrders() {
         return EntityManagerHelper.findMany(entityManager, OrderEntity.class,
-                "select o from OrderEntity o where o.orderState in (:open, :scheduled, :locked)",
+                "select o from OrderEntity o where o.orderState in (:open, :scheduled)",
                 QueryParamBuilder.withParams(2).
                         param("open", OrderState.OPEN).
-                        param("scheduled", OrderState.SCHEDULED).
-                        param("locked", OrderState.LOCKED));
+                        param("scheduled", OrderState.SCHEDULED));
     }
     
     public void deleteOrderSequences() {
-        // TODO Auto-generated method stub
-        
+        entityManager.createQuery("delete from SequenceElementEntity os").
+                executeUpdate();
     }
     
     public void persistOrderSequence(String operator, List<OrderKey> sequence) {
-        // TODO Auto-generated method stub
-        
+        for (int sequenceNumber = 0; sequenceNumber < sequence.size(); sequenceNumber++) {
+            SequenceElementEntity entity =
+                    new SequenceElementEntity(operator, sequenceNumber, sequence.get(sequenceNumber));
+            entityManager.persist(entity);
+        }
     }
 }

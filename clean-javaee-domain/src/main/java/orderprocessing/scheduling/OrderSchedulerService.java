@@ -14,31 +14,33 @@ import javax.inject.Inject;
 
 import orderprocessing.OrderEntity;
 import orderprocessing.OrderKey;
+import orderprocessing.OrderLineEntity;
+import orderprocessing.OrderProgressManagementRemote;
 import orderprocessing.OrderRepository;
-import orderprocessing.OrderState;
+import persistence.NotFoundException;
 import server.Configuration;
 
 /**
- * TODO KM Write comment to type OrderSchedulerService
+ * {@link OrderSchedulerService} prepare daily schedule for operators. Service
+ * implements {@link OrderProgressManagementRemote} and allows operators to mark
+ * progress of order preparation.
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
 @Stateless
 @LocalBean
-public class OrderSchedulerService implements OrderSchedulerRemote {
+public class OrderSchedulerService implements OrderProgressManagementRemote {
     
     @EJB OrderRepository orderRepository;
     
     @Inject @Configuration protected Set<String> operators;
-    @Inject @Configuration protected Set<AssignmentRule> assignmentRules;
-    @Inject @Configuration protected ProcessingCostCalculator processingCostCalculator;
     
     /**
      * <p>
      * <ol>
      * <li>treat scheduled but not processed orders as open
-     * <li>read open and locked orders
-     * <li>split orders (locked too) between operators
+     * <li>read open orders
+     * <li>split orders between operators
      * <li>assignment need to honor rules
      * <ul>
      * <li>operator kasia not process orders from category A1 and with item like
@@ -46,7 +48,7 @@ public class OrderSchedulerService implements OrderSchedulerRemote {
      * <li>operator krzysiek process all orders
      * <li>operator michal process only orders from category A1
      * </ul>
-     * <li>assignment should by balanced (sum item*weight)
+     * <li>assignment should by balanced based on sum of items
      * 
      * mark orders as processed
      */
@@ -72,14 +74,23 @@ public class OrderSchedulerService implements OrderSchedulerRemote {
             for (String operator : operators) {
                 assignmentOptions.put(operator, true);
             }
-            OPERATOR: for (String operator : operators) {
-                for (AssignmentRule rule : assignmentRules) {
-                    boolean passRulle = rule.canPrepareOrder(operator, order);
-                    boolean canPrepareOrder = assignmentOptions.get(operator);
-                    
-                    assignmentOptions.put(operator, canPrepareOrder && passRulle);
-                    if (!passRulle) {
-                        continue OPERATOR;
+            for (String operator : operators) {
+                if (operator.equals("michal")) {
+                    boolean passRule = order.getOrderKey().getCategory().equals("A1");
+                    assignmentOptions.put(operator, passRule);
+                    if (!passRule) {
+                        continue;
+                    }
+                } else if (operator.equals("kasia")) {
+                    if (order.getOrderKey().getCategory().equals("A1")) {
+                        assignmentOptions.put(operator, false);
+                        continue;
+                    }
+                    for (OrderLineEntity orderLine : order.getOrderLines()) {
+                        if (orderLine.getItemKey().isLike("tv*")) {
+                            assignmentOptions.put(operator, false);
+                            continue;
+                        }
                     }
                 }
             }
@@ -95,13 +106,11 @@ public class OrderSchedulerService implements OrderSchedulerRemote {
             }
             if (assignedOperator != null) {
                 assignments.get(assignedOperator).add(order.getOrderKey());
-                int orderCost = processingCostCalculator.computeOrderCost(order);
+                int orderCost = order.getOrderLines().size();
                 int operatorAssigementCost = assignmentCost.get(assignedOperator);
                 assignmentCost.put(assignedOperator, operatorAssigementCost + orderCost);
                 
-                if (order.getOrderState() != OrderState.LOCKED) {
-                    order.markAsScheduled();
-                }
+                order.markAsScheduled();
             }
         }
         orderRepository.deleteOrderSequences();
@@ -111,30 +120,17 @@ public class OrderSchedulerService implements OrderSchedulerRemote {
     }
     
     @Override
-    public void lockOrder(OrderKey orderKey) {
-        // TODO KM Auto-generated method stub
-        // mark orders as locked
-        
-    }
-    
-    @Override
-    public void unlockOrder(OrderKey orderKey) {
-        // TODO KM Auto-generated method stub
-        // mark orders as processed
-    }
-    
-    @Override
-    public List<OrderKey> getOrderSequence(String operator) {
-        // TODO KM Auto-generated method stub
-        // read order sequence
-        return null;
-    }
-    
-    @Override
-    public Set<OrderKey> getLockedOrders() {
-        // TODO KM Auto-generated method stub
-        // read locked orders
-        return null;
+    public void orderDone(OrderKey orderKey) {
+        try {
+            OrderEntity order = orderRepository.findOrder(orderKey);
+            // e.g. interact with delivery subsystem:
+            // deliveryService.printShipmentLabel(orderKey, operatorPrinter)
+            // deliveryService.orderReadyToShipment(orderKey)
+            order.markAsProcessed();
+        } catch (NotFoundException e) {
+            // if order could by deleted in meanwhile and should not by
+            // processed start emergency procedures e.g. send email to manager
+        }
     }
     
 }

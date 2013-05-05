@@ -71,6 +71,17 @@ public class OrderEntity implements Serializable {
         }
     }
     
+    public void markAsProcessed() {
+        if (orderState == OrderState.SCHEDULED) {
+            orderState = OrderState.PROCESSED;
+            // e.g. log info to auditing database
+        } else {
+            throw new IllegalStateException("Order state transition: " +
+                    orderState + " -> " + OrderState.PROCESSED +
+                    " is illegal");
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

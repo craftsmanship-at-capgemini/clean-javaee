@@ -6,5 +6,5 @@ package orderprocessing;
  */
 public enum OrderState {
     
-    OPEN, SCHEDULED, PROCESSED, LOCKED, CLOSED
+    OPEN, SCHEDULED, PROCESSED, CLOSED
 }

@@ -197,7 +197,6 @@ public class OrderRepositoryTest {
         
         OrderEntity o = alias(OrderEntity.class, "o");
         @SuppressWarnings("unchecked")
-        //
         List<OrderEntity> actual = persistenceUnit.createQuery(
                 select(o).from(OrderEntity.class).as(o)
                 ).getResultList();
@@ -223,7 +222,6 @@ public class OrderRepositoryTest {
         
         OrderEntity o = alias(OrderEntity.class, "o");
         @SuppressWarnings("unchecked")
-        //
         List<OrderEntity> actual = persistenceUnit.createQuery(
                 select(o).from(OrderEntity.class).as(o)
                 ).getResultList();
@@ -243,7 +241,7 @@ public class OrderRepositoryTest {
                         withOrderState(OrderState.PROCESSED).build(),
                 expected1,
                 OrderBuilder.anOrder().likeSomeProcessed7KOrder().
-                        withOrderState(OrderState.LOCKED).build(),
+                        withOrderState(OrderState.CLOSED).build(),
                 expected2
                 );
         

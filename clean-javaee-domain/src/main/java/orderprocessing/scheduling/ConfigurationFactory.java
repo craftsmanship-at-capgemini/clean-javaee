@@ -74,12 +74,6 @@ public class ConfigurationFactory {
                 ));
     }
     
-    @Produces
-    @server.Configuration
-    ProcessingCostCalculator createProcessingCostCalculator() {
-        return null;
-    }
-    
     private Properties readClasspathProperties(String file) {
         Properties properties = new Properties();
         try {
