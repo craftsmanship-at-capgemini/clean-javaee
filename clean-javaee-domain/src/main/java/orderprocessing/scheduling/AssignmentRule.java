@@ -1,28 +1,24 @@
 package orderprocessing.scheduling;
 
-import inventory.ItemKey;
-
-import java.util.Set;
-
-import orderprocessing.OrderKey;
-
+import orderprocessing.OrderEntity;
 
 /**
- * Each AssignmentRule says: operator X can or can't prepare order Y.
+ * <p>
+ * Each {@link AssignmentRule} says: operator X can't (or can only) prepare
+ * order with properties Y.
  * <p>
  * Assignment rules examples:
+ * <ul>
+ * <li>michal can prepare only orders with category A1
+ * <li>kasia can't prepare orders with category A1
+ * <li>kasia can't prepare orders with item like 'tv*'
  * 
- * <pre>
- * michal: order.orderKey.category == 'A1'
- * michal: order.orderLines.contains {it ~ '*tv*'}
- * </pre>
- * 
- * Example rule set says: michal can't prepare orders with category A1 or orders containing item
- * like *washing-machine*.
+ * <p>
+ * Rule should always return true if operator not match to rule.
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
 public interface AssignmentRule {
     
-    boolean canPrepareOrder(String operator, OrderKey orderKey, Set<ItemKey> items);
+    boolean canPrepareOrder(String operator, OrderEntity order);
 }

@@ -186,7 +186,7 @@ public class OrderRepositoryTest {
     @Test
     public void shouldDoNothingWhenThereIsNonClosedOrder() {
         OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderState(OrderState.ACCEPTED).build();
+                withOrderState(OrderState.SCHEDULED).build();
         OrderEntity expected2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
                 withOrderState(OrderState.PROCESSED).build();
         persistenceUnit.persist(expected1, expected2);
@@ -196,7 +196,8 @@ public class OrderRepositoryTest {
         persistenceUnit.commit();
         
         OrderEntity o = alias(OrderEntity.class, "o");
-        @SuppressWarnings("unchecked")//
+        @SuppressWarnings("unchecked")
+        //
         List<OrderEntity> actual = persistenceUnit.createQuery(
                 select(o).from(OrderEntity.class).as(o)
                 ).getResultList();
@@ -211,7 +212,7 @@ public class OrderRepositoryTest {
                 withOrderKey(favoriteOrderKey).
                 withOrderState(OrderState.CLOSED).build();
         OrderEntity expected = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderState(OrderState.ACCEPTED).build();
+                withOrderState(OrderState.SCHEDULED).build();
         OrderEntity toDelete2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
                 withOrderState(OrderState.CLOSED).build();
         persistenceUnit.persist(toDelete1, expected, toDelete2);
@@ -221,12 +222,33 @@ public class OrderRepositoryTest {
         persistenceUnit.commit();
         
         OrderEntity o = alias(OrderEntity.class, "o");
-        @SuppressWarnings("unchecked")//
+        @SuppressWarnings("unchecked")
+        //
         List<OrderEntity> actual = persistenceUnit.createQuery(
                 select(o).from(OrderEntity.class).as(o)
                 ).getResultList();
         
         assertThat(actual).
                 containsOnly(expected);
+    }
+    
+    @Test
+    public void shouldFindOpenOrderWhenManyExists() throws NotFoundException {
+        OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
+                withOrderKey("123456789", "AA", "2013").withOrderState(OrderState.OPEN).build();
+        OrderEntity expected2 = OrderBuilder.anOrder().likeSomeNew8ROrder().
+                withOrderKey("012345678", "AA", "2013").withOrderState(OrderState.OPEN).build();
+        persistenceUnit.persist(
+                OrderBuilder.anOrder().likeSomeNew8ROrder().
+                        withOrderState(OrderState.PROCESSED).build(),
+                expected1,
+                OrderBuilder.anOrder().likeSomeProcessed7KOrder().
+                        withOrderState(OrderState.LOCKED).build(),
+                expected2
+                );
+        
+        List<OrderEntity> actual = orderRepository.findNotDoneOrders();
+        
+        assertThat(actual).containsOnly(expected1, expected2);
     }
 }

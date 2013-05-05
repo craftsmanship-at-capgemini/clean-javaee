@@ -28,6 +28,10 @@ public class ItemKey implements Serializable {
         return itemKey;
     }
     
+    public boolean isLike(String regexp) {
+        return itemKey.matches(regexp);
+    }
+    
     protected void setItemKey(String itemKey) {
         this.itemKey = itemKey;
     }
