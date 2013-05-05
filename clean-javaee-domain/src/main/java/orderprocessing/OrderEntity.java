@@ -1,6 +1,7 @@
 package orderprocessing;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,11 +41,45 @@ public class OrderEntity implements Serializable {
     protected CustomerEntity customer;
     @Temporal(TemporalType.TIMESTAMP) @NotNull protected Date creationTime;
     
-    @OneToMany(mappedBy = "order",
-            cascade = CascadeType.ALL, orphanRemoval = true)//
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)//
     protected Set<OrderLineEntity> orderLines = new HashSet<OrderLineEntity>();
     
     protected OrderEntity() {
+    }
+    
+    public OrderKey getOrderKey() {
+        return orderKey;
+    }
+    
+    public OrderState getOrderState() {
+        return orderState;
+    }
+    
+    public Set<OrderLineEntity> getOrderLines() {
+        return Collections.unmodifiableSet(orderLines);
+    }
+    
+    public void markAsScheduled() {
+        if (orderState == OrderState.OPEN ||
+                orderState == OrderState.SCHEDULED) {
+            orderState = OrderState.SCHEDULED;
+            // e.g. log info to auditing database
+        } else {
+            throw new IllegalStateException("Order state transition: " +
+                    orderState + " -> " + OrderState.SCHEDULED +
+                    " is illegal");
+        }
+    }
+    
+    public void markAsProcessed() {
+        if (orderState == OrderState.SCHEDULED) {
+            orderState = OrderState.PROCESSED;
+            // e.g. log info to auditing database
+        } else {
+            throw new IllegalStateException("Order state transition: " +
+                    orderState + " -> " + OrderState.PROCESSED +
+                    " is illegal");
+        }
     }
     
     @Override
@@ -117,5 +152,4 @@ public class OrderEntity implements Serializable {
         }
         return true;
     }
-    
 }

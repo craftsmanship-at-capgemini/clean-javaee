@@ -39,6 +39,18 @@ public class OrderLineEntity implements Serializable {
     protected OrderLineEntity() {
     }
     
+    public OrderEntity getOrder() {
+        return order;
+    }
+    
+    public ItemKey getItemKey() {
+        return itemKey;
+    }
+    
+    public int getQuantity() {
+        return quantity;
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
