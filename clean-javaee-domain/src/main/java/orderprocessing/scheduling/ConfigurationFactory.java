@@ -1,5 +1,8 @@
 package orderprocessing.scheduling;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -10,21 +13,18 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.inject.Inject;
 
 import orderprocessing.OrderEntity;
-import orderprocessing.OrderLineEntity;
+import server.Configuration;
 
 @ApplicationScoped
 public class ConfigurationFactory {
     
-    Properties properties;
-    
-    public ConfigurationFactory() {
-        properties = readClasspathProperties("/orderprocessing.scheduling.Configuration.properties");
-    }
+    @Inject @Configuration Properties properties;
     
     @Produces
-    @server.Configuration
+    @Configuration
     String createString(InjectionPoint injectionPoint) {
         String key = injectionPoint.getBean().getBeanClass().getName() +
                 injectionPoint.getMember().getName();
@@ -32,7 +32,7 @@ public class ConfigurationFactory {
     }
     
     @Produces
-    @server.Configuration
+    @Configuration
     Set<String> createSet(InjectionPoint injectionPoint) {
         String key = injectionPoint.getBean().getBeanClass().getName() +
                 injectionPoint.getMember().getName();
@@ -42,39 +42,50 @@ public class ConfigurationFactory {
     }
     
     @Produces
-    @server.Configuration
-    Set<AssignmentRule> createAssignmentRules() {
-        return new HashSet<AssignmentRule>(Arrays.asList(
-                new AssignmentRule() {
-                    @Override
-                    public boolean canPrepareOrder(String operator, OrderEntity order) {
-                        if (operator.equals("michal")) {
-                            return order.getOrderKey().getCategory().equals("A1");
-                        }
-                        return true;
-                    }
-                },
-                new AssignmentRule() {
-                    @Override
-                    public boolean canPrepareOrder(String operator, OrderEntity order) {
-                        if (operator.equals("kasia")) {
-                            if (order.getOrderKey().getCategory().equals("A1")) {
-                                return false;
-                            }
-                            Set<OrderLineEntity> orderLines = order.getOrderLines();
-                            for (OrderLineEntity orderLine : orderLines) {
-                                if (orderLine.getItemKey().isLike("tv*")) {
-                                    return false;
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                }
-                ));
+    @Configuration
+    Set<AssignmentRule> createAssignmentRules(InjectionPoint injectionPoint) {
+        String key = injectionPoint.getBean().getBeanClass().getName() +
+                injectionPoint.getMember().getName();
+        Set<AssignmentRule> ruleset = new HashSet<AssignmentRule>();
+        String rulesString = properties.getProperty(key);
+        for (String ruleLine : rulesString.split("\n")) {
+            String[] ruleParts = ruleLine.split(":");
+            if (ruleParts.length == 2) {
+                ruleset.add(createRule(ruleParts[0], ruleParts[1]));
+            } else {
+                // log business rule error
+            }
+        }
+        
+        return ruleset;
     }
     
-    private Properties readClasspathProperties(String file) {
+    AssignmentRule createRule(final String ruleOperator, final String ruleDefinition) {
+        return new AssignmentRule() {
+            @Override
+            public boolean canPrepareOrder(String operator, OrderEntity order) {
+                if (operator.equals(ruleOperator.trim())) {
+                    // try {
+                    Binding binding = new Binding();
+                    binding.setVariable("order", order);
+                    GroovyShell rule = new GroovyShell(binding);
+                    Object value = rule.evaluate(ruleDefinition);
+                    return (Boolean) value;
+                    // } catch (GroovyRuntimeException e) {
+                    // log business rule error
+                    // return true;
+                    // }
+                } else {
+                    return true;
+                }
+            }
+        };
+    }
+    
+    @Produces
+    @Configuration
+    Properties createClasspathProperties() {
+        String file = "/orderprocessing.scheduling.Configuration.properties";
         Properties properties = new Properties();
         try {
             InputStream input =

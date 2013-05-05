@@ -15,7 +15,6 @@ import javax.inject.Inject;
 
 import orderprocessing.OrderEntity;
 import orderprocessing.OrderKey;
-import orderprocessing.OrderLineEntity;
 import orderprocessing.OrderProgressManagementRemote;
 import orderprocessing.OrderRepository;
 import persistence.NotFoundException;
@@ -34,7 +33,8 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
     
     @EJB OrderRepository orderRepository;
     
-    @Inject @Configuration protected Set<String> operators;
+    @Inject @Configuration Set<String> operators;
+    @Inject @Configuration Set<AssignmentRule> assignmentRules;
     
     /**
      * <p>
@@ -56,33 +56,19 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
     @Schedule(hour = "4")
     protected void makeScheduleForToday() {
         List<OrderEntity> openOrders = orderRepository.findNotDoneOrders();
-        
         Assignments assignments = new Assignments(operators);
-        
         for (OrderEntity order : openOrders) {
             AssignmentOptions assignmentOptions = new AssignmentOptions(operators);
-            
+            OPERATOR_LOOP: //
             for (String operator : operators) {
-                if (operator.equals("michal")) {
-                    boolean passRule = order.getOrderKey().getCategory().equals("A1");
-                    if (!passRule) {
+                for (AssignmentRule rule : assignmentRules) {
+                    boolean passRulle = rule.canPrepareOrder(operator, order);
+                    if (!passRulle) {
                         assignmentOptions.cantPrepareOrder(operator);
-                        continue;
-                    }
-                } else if (operator.equals("kasia")) {
-                    if (order.getOrderKey().getCategory().equals("A1")) {
-                        assignmentOptions.cantPrepareOrder(operator);
-                        continue;
-                    }
-                    for (OrderLineEntity orderLine : order.getOrderLines()) {
-                        if (orderLine.getItemKey().isLike("tv*")) {
-                            assignmentOptions.cantPrepareOrder(operator);
-                            continue;
-                        }
+                        continue OPERATOR_LOOP;
                     }
                 }
             }
-            
             Set<String> possibleOperators = assignmentOptions.getPossibleOperators();
             if (!possibleOperators.isEmpty()) {
                 String assignedOperator =

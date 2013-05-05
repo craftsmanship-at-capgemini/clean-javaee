@@ -75,13 +75,17 @@ public class OrderBuilder {
         return this;
     }
     
-    public OrderBuilder withSomeOrderLines1() {
-        orderLines.add(new OrderLineEntity(null, new ItemKey("ksr-14-378"), 1));
-        orderLines.add(new OrderLineEntity(null, new ItemKey("jre-07-666"), 2));
+    public OrderBuilder withOrderLine(ItemKey itemKey, int quantity) {
+        orderLines.add(new OrderLineEntity(null, itemKey, quantity));
         return this;
     }
     
-    public OrderBuilder withOrderLine(ItemKey itemKey, int quantity) {
+    public OrderBuilder withoutOrderLines() {
+        orderLines = new HashSet<OrderLineEntity>();
+        return this;
+    }
+    
+    public OrderBuilder withSomeOrderLines1() {
         orderLines.add(new OrderLineEntity(null, new ItemKey("ksr-14-378"), 1));
         orderLines.add(new OrderLineEntity(null, new ItemKey("jre-07-666"), 2));
         return this;
@@ -91,11 +95,6 @@ public class OrderBuilder {
         orderLines.add(new OrderLineEntity(null, new ItemKey("wro-71-000"), 1));
         orderLines.add(new OrderLineEntity(null, new ItemKey("waw-22-111"), 1));
         orderLines.add(new OrderLineEntity(null, new ItemKey("poz-61-222"), 1));
-        return this;
-    }
-    
-    public OrderBuilder withoutOrderLines() {
-        orderLines = new HashSet<OrderLineEntity>();
         return this;
     }
     

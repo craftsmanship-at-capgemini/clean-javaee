@@ -66,7 +66,7 @@ public class OrderSchedulerServiceTest {
         when(repository.findNotDoneOrders()).thenReturn(Arrays.asList(order));
         
         service.operators = operators;
-        // service.assignmentRules = assignmentRules;
+        service.assignmentRules = assignmentRules;
         service.makeScheduleForToday();
         
         verify(repository, times(3)).persistOrderSequence(
@@ -106,7 +106,7 @@ public class OrderSchedulerServiceTest {
         when(repository.findNotDoneOrders()).thenReturn(toSchedule);
         
         service.operators = operators;
-        // service.assignmentRules = assignmentRules;
+        service.assignmentRules = assignmentRules;
         service.makeScheduleForToday();
         
         verify(repository, times(3)).persistOrderSequence(
