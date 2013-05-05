@@ -83,12 +83,12 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
                 }
             }
             
-            String assignedOperator = assignments.operatorWithMinUtilization(
-                    assignmentOptions.getPossibleOperators());
-            
-            if (assignedOperator != null) {
-                int orderPreparationCost = order.getOrderLines().size();
-                assignments.assign(assignedOperator, order.getOrderKey(), orderPreparationCost);
+            Set<String> possibleOperators = assignmentOptions.getPossibleOperators();
+            if (!possibleOperators.isEmpty()) {
+                String assignedOperator =
+                        assignments.operatorWithMinUtilization(possibleOperators);
+                assignments.assign(assignedOperator, order.getOrderKey(),
+                        calculateOrderPreparationCost(order));
                 order.markAsScheduled();
             }
         }
@@ -96,6 +96,10 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
         for (String operator : operators) {
             orderRepository.persistOrderSequence(operator, assignments.getAssignments(operator));
         }
+    }
+    
+    private int calculateOrderPreparationCost(OrderEntity order) {
+        return order.getOrderLines().size();
     }
     
     @Override
