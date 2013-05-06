@@ -62,8 +62,8 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
             OPERATOR_LOOP: //
             for (String operator : operators) {
                 for (AssignmentRule rule : assignmentRules) {
-                    boolean passRulle = rule.canPrepareOrder(operator, order);
-                    if (!passRulle) {
+                    boolean isRulePassed = rule.canPrepareOrder(operator, order);
+                    if (!isRulePassed) {
                         assignmentOptions.cantPrepareOrder(operator);
                         continue OPERATOR_LOOP;
                     }
