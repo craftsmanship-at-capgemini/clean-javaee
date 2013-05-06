@@ -42,13 +42,16 @@ public class OrderRepositoryTest {
     
     @Test
     public void shouldFindOrderWhenExistsOnlyOne() throws NotFoundException {
+        // given
         OrderKey orderKey = favoriteOrderKey;
         OrderEntity expected = OrderBuilder.anOrder().likeSomeNew8ROrder().
                 withOrderKey(orderKey).build();
         persistenceUnit.persist(expected);
-        
+
+        // when
         OrderEntity actual = orderRepository.findOrder(orderKey);
         
+        // then
         // .isNotSameAs(expected) is only demonstrational
         // is(equalIgnoringIdAndVersion(expected)) ignores equals() method
         // ignoring id and version is not important by persisted entities
@@ -126,26 +129,24 @@ public class OrderRepositoryTest {
     
     @Test
     public void shouldFindAllCustomerOrdersAndIgnoreOthers() {
+        // given
         CustomerKey customerKey = new CustomerKey(13L);
-        OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderKey("123456789", "AA", "2013").build();
-        OrderEntity expected2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
-                withOrderKey("012345678", "AA", "2013").build();
-        persistenceUnit.persist(
-                OrderBuilder.anOrder().likeSomeNew8ROrder().build(),
-                CustomerBuilder.aCustomer().likeCustomerWithoutOrders().
-                        withCustomerKey(customerKey).withOrders(
-                                expected1,
-                                expected2
-                        ).build(),
-                OrderBuilder.anOrder().likeSomeProcessed7KOrder().build()
-                );
-        
+        OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder()
+                .withOrderKey("123456789", "AA", "2013").build();
+        OrderEntity expected2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder()
+                .withOrderKey("012345678", "AA", "2013").build();
+        OrderEntity order8R = OrderBuilder.anOrder().likeSomeNew8ROrder().build();
+        CustomerEntity customer = CustomerBuilder.aCustomer().likeCustomerWithoutOrders()
+                .withCustomerKey(customerKey).withOrders(expected1, expected2).build();
+        OrderEntity order7K = OrderBuilder.anOrder().likeSomeProcessed7KOrder().build();
+        persistenceUnit.persist(order8R, customer, order7K);
+
+        // when
         List<OrderEntity> actual = orderRepository.findOrdersOfCustomer(customerKey);
-        
+
+        // then
         // ignores order of records but use equals!
-        assertThat(actual).
-                containsOnly(expected1, expected2);
+        assertThat(actual).containsOnly(expected1, expected2);
     }
     
     @Test
