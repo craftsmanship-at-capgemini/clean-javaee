@@ -18,12 +18,12 @@ import web.PageController;
 
 /**
  * <p>
- * Page displays list of orders for particular operator. Operator needs to by defined as cookie on
- * client site.
+ * Page displays list of orders for particular operator.
  * <p>
- * Page allows lock, unlock and mark as done an order.
+ * <strong>Note</strong> Operator needs to by defined as cookie on client site.
  * <p>
- * Navigation to brake page (associated with {@link OperatorBreakPageController}) is possible.
+ * Page allows to mark an order as done or navigate to brake page (associated
+ * with {@link OperatorBreakPageController}).
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
@@ -36,10 +36,10 @@ public class OrdersListPageController {
         return new Outcome(OrdersListPageController.class).build();
     }
     
-    @EJB private OrderSchedulerRemote orderScheduler;
+    @EJB OrderSchedulerRemote orderScheduler;
     
-    @Inject @Messages private Collection<FacesMessage> messages;
-    @Inject private OperatorsupportI18n i18n;
+    @Inject @Messages Collection<FacesMessage> messages;
+    @Inject OperatorsupportI18n i18n;
     
     private String operator;
     private List<OrderKey> orders;
@@ -68,19 +68,8 @@ public class OrdersListPageController {
     }
     
     @Inject
-    @CookieParam(OPERATOR_KEY_COOKIE)
-    public void setOperator(String operator) {
+    public void setOperator(@CookieParam(OPERATOR_KEY_COOKIE) String operator) {
         this.operator = operator;
-    }
-    
-    @Action
-    public void lockOrder(OrderKey orderKey) {
-        orderScheduler.lockOrder(orderKey);
-    }
-    
-    @Action
-    public void unlockOrder(OrderKey orderKey) {
-        orderScheduler.unlockOrder(orderKey);
     }
     
     @Action

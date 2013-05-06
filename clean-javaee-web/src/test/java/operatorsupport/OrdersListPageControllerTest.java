@@ -106,24 +106,6 @@ public class OrdersListPageControllerTest {
     }
     
     @Test
-    public void shouldLockOrderWhenLockActionIsCalled() {
-        OrderKey orderKey = new OrderKey("123456789", "H2", "2013");
-        
-        controller.lockOrder(orderKey);
-        
-        Mockito.verify(service).lockOrder(orderKey);
-    }
-    
-    @Test
-    public void shouldUnlockOrderWhenUnlockActionIsCalled() {
-        OrderKey orderKey = new OrderKey("123456789", "H2", "2013");
-        
-        controller.unlockOrder(orderKey);
-        
-        Mockito.verify(service).unlockOrder(orderKey);
-    }
-    
-    @Test
     public void shouldMarkOrderAsProcessedWhenOrderDoneActionIsCalled() {
         OrderKey orderKey = new OrderKey("123456789", "H2", "2013");
         
