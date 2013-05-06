@@ -50,8 +50,7 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
      * <li>operator michal process only orders from category A1
      * </ul>
      * <li>assignment should by balanced based on sum of items
-     * 
-     * mark orders as processed
+     * <li>mark orders as scheduled
      */
     @Schedule(hour = "4")
     protected void makeScheduleForToday() {
