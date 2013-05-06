@@ -95,5 +95,25 @@ public class OrderLineEntity implements Serializable {
         }
         return true;
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setOrder(OrderEntity order) {
+        this.order = order;
+    }
+
+    public void setItemKey(ItemKey itemKey) {
+        this.itemKey = itemKey;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
     
 }

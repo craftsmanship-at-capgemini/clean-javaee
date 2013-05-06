@@ -6,7 +6,14 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.atIndex;
 import static testing.Conditions.equalIgnoringIdAndVersion;
 
+import inventory.ItemKey;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.PersistenceUnitUtil;
@@ -147,6 +154,90 @@ public class OrderRepositoryTest {
         // then
         // ignores order of records but use equals!
         assertThat(actual).containsOnly(expected1, expected2);
+    }
+    
+    // TODO Krzysztof Michalski, 06-05-2013: delete this method
+    @Test
+    public void shouldFindAllCustomerOrdersAndIgnoreOthersUsingSetters() {
+        // given
+        OrderKey expectedOrder8RKey = new OrderKey("123456789", "AA", "2013");        
+        OrderEntity expected8ROrder = buildNew8ROrder(expectedOrder8RKey);
+        OrderKey expectedOrder7KKey = new OrderKey("012345678", "AA", "2013");
+        OrderEntity expected7KOrder = buildProcessed7KOrder(expectedOrder7KKey);  
+        
+        OrderKey order8RKey = new OrderKey("516244215", "8R", "2013");
+        OrderEntity order8RToPersist = buildNew8ROrder(order8RKey);
+        CustomerKey customerKey = new CustomerKey(13L);
+        CustomerEntity customerToPersist = buildNewCustomerWithKey(customerKey);
+        addOrdersToCustomer(customerToPersist, expected8ROrder, expected7KOrder);
+        OrderKey order7KKey = new OrderKey("421551624", "7K", "2013");
+        OrderEntity order7KToPersist = buildProcessed7KOrder(order7KKey);
+        
+        persistenceUnit.persist(order8RToPersist, customerToPersist, order7KToPersist);
+
+        // when
+        List<OrderEntity> actual = orderRepository.findOrdersOfCustomer(customerKey);
+
+        // then
+        assertThat(actual).containsOnly(expected8ROrder, expected7KOrder);
+    }
+
+    private void addOrdersToCustomer(CustomerEntity customer, OrderEntity expected1, OrderEntity expected2) {
+        Set<OrderEntity> orders = new HashSet<OrderEntity>();
+        orders.add(expected1);
+        orders.add(expected2);
+        customer.setOrders(orders);
+        for (OrderEntity order : orders) {
+            order.setCustomer(customer);
+        }
+    }
+
+    private OrderEntity buildNew8ROrder(OrderKey order8RKey) {
+        OrderEntity order = new OrderEntity();
+        order.setOrderKey(order8RKey);
+        order.setOrderState(OrderState.OPEN);
+        order.setCustomer(buildNewCustomer());
+        order.setCreationTime(new Date());
+        Set<OrderLineEntity> orderLines = buildOrderLines1();        
+        order.setOrderLines(orderLines);
+        return order;
+    }
+    
+    private OrderEntity buildProcessed7KOrder(OrderKey orderKey) {
+        OrderEntity order = new OrderEntity();
+        order.setOrderKey(orderKey);
+        order.setOrderState(OrderState.PROCESSED);
+        order.setCustomer(buildNewCustomer());
+        order.setCreationTime(new Date());
+        Set<OrderLineEntity> orderLines = buildOrderLines2();        
+        order.setOrderLines(orderLines);
+        return order;
+    }
+
+    private Set<OrderLineEntity> buildOrderLines1() {
+        Set<OrderLineEntity> orderLines = new HashSet<OrderLineEntity>();
+        orderLines.add(new OrderLineEntity(null, new ItemKey("ksr-14-378"), 1));
+        orderLines.add(new OrderLineEntity(null, new ItemKey("jre-07-666"), 2));
+        return orderLines;
+    }
+    
+    private Set<OrderLineEntity> buildOrderLines2() {
+        Set<OrderLineEntity> orderLines = new HashSet<OrderLineEntity>();
+        orderLines.add(new OrderLineEntity(null, new ItemKey("wro-71-000"), 1));
+        orderLines.add(new OrderLineEntity(null, new ItemKey("waw-22-111"), 1));
+        orderLines.add(new OrderLineEntity(null, new ItemKey("poz-61-222"), 1));
+        return orderLines;
+    }
+
+    private CustomerEntity buildNewCustomer() {
+        CustomerKey customerKey = new CustomerKey(3840576321L);
+        return buildNewCustomerWithKey(customerKey);
+    }
+    
+    private CustomerEntity buildNewCustomerWithKey(CustomerKey customerKey) {
+        CustomerEntity customer = new CustomerEntity();
+        customer.setCustomerKey(customerKey);
+        return customer;
     }
     
     @Test

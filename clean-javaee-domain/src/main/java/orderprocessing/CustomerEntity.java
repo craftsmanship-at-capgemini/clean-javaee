@@ -76,5 +76,37 @@ public class CustomerEntity implements Serializable {
         }
         return true;
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public CustomerKey getCustomerKey() {
+        return customerKey;
+    }
+
+    public void setCustomerKey(CustomerKey customerKey) {
+        this.customerKey = customerKey;
+    }
+
+    public Set<OrderEntity> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<OrderEntity> orders) {
+        this.orders = orders;
+    }
     
 }
