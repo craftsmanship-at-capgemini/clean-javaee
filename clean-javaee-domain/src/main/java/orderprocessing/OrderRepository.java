@@ -37,12 +37,12 @@ public class OrderRepository {
     }
     
     public void deleteClosedOrders() {
-        entityManager.createQuery("delete from OrderLineEntity ol where ol.order.orderState = :state").
-                setParameter("state", OrderState.CLOSED).
-                executeUpdate();
-        entityManager.createQuery("delete from OrderEntity o where o.orderState = :state").
-                setParameter("state", OrderState.CLOSED).
-                executeUpdate();
+        entityManager.createQuery("delete from OrderLineEntity ol where ol.order.orderState = :state")
+                .setParameter("state", OrderState.CLOSED)
+                .executeUpdate();
+        entityManager.createQuery("delete from OrderEntity o where o.orderState = :state")
+                .setParameter("state", OrderState.CLOSED)
+                .executeUpdate();
     }
     
     public List<OrderEntity> findNotDoneOrders() {

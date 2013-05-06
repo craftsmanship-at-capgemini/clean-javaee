@@ -17,6 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.code.liquidform.FromClause;
+
 import persistence.NotFoundException;
 import testing.Testing;
 import testing.persistence.TestingPersistenceUnit;
@@ -208,27 +210,25 @@ public class OrderRepositoryTest {
     
     @Test
     public void shouldDeleteClosedOrders() {
-        OrderEntity toDelete1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderKey(favoriteOrderKey).
-                withOrderState(OrderState.CLOSED).build();
-        OrderEntity expected = OrderBuilder.anOrder().likeSomeNew8ROrder().
-                withOrderState(OrderState.SCHEDULED).build();
-        OrderEntity toDelete2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
-                withOrderState(OrderState.CLOSED).build();
-        persistenceUnit.persist(toDelete1, expected, toDelete2);
-        
+        OrderEntity orderToDelete1 = OrderBuilder.anOrder().likeSomeNew8ROrder()
+                .withOrderKey(favoriteOrderKey)
+                .withOrderState(OrderState.CLOSED).build();
+        OrderEntity expectedNotDeletedOrder = OrderBuilder.anOrder().likeSomeNew8ROrder()
+                .withOrderState(OrderState.SCHEDULED).build();
+        OrderEntity orderToDelete2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder()
+                .withOrderState(OrderState.CLOSED).build();
+        persistenceUnit.persist(orderToDelete1, expectedNotDeletedOrder, orderToDelete2);
+
         persistenceUnit.begin();
         orderRepository.deleteClosedOrders();
         persistenceUnit.commit();
-        
+
         OrderEntity o = alias(OrderEntity.class, "o");
+        FromClause<OrderEntity, OrderEntity> queryFromClause = select(o).from(OrderEntity.class).as(o);
         @SuppressWarnings("unchecked")
-        List<OrderEntity> actual = persistenceUnit.createQuery(
-                select(o).from(OrderEntity.class).as(o)
-                ).getResultList();
-        
-        assertThat(actual).
-                containsOnly(expected);
+        List<OrderEntity> actual = persistenceUnit.createQuery(queryFromClause).getResultList();
+
+        assertThat(actual).containsOnly(expectedNotDeletedOrder);
     }
     
     @Test

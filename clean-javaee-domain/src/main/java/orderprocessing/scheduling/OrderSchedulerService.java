@@ -37,20 +37,20 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
     @Inject @Configuration Set<AssignmentRule> assignmentRules;
     
     /**
-     * <p>
      * <ol>
-     * <li>treat scheduled but not processed orders as open
-     * <li>read open orders
-     * <li>split orders between operators
-     * <li>assignment need to honor rules
+     * <li>treat scheduled but not processed orders as open</li>
+     * <li>read open orders</li>
+     * <li>split orders between operators</li>
+     * <li>assignment needs to respect the following rules:</li> 
      * <ul>
-     * <li>operator kasia not process orders from category A1 and with item like
+     * <li>operator kasia doesn't process orders from category A1 and with item like</li>
      * 'tv*'
-     * <li>operator krzysiek process all orders
-     * <li>operator michal process only orders from category A1
+     * <li>operator krzysiek processes all orders</li>
+     * <li>operator michal processes only orders from category A1</li>
      * </ul>
-     * <li>assignment should by balanced based on sum of items
-     * <li>mark orders as scheduled
+     * <li>assignment should be balanced based on sum of items</li>
+     * <li>mark orders as scheduled</li>
+     * </ol>
      */
     @Schedule(hour = "4")
     protected void makeScheduleForToday() {
