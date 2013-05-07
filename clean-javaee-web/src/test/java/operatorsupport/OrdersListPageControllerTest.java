@@ -14,7 +14,7 @@ import javax.faces.application.FacesMessage;
 import javax.inject.Inject;
 
 import orderprocessing.OrderKey;
-import orderprocessing.scheduling.OrderSchedulerService;
+import orderprocessing.OrderProgressManagementRemote;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,9 @@ public class OrdersListPageControllerTest {
     
     @Inject OrdersListPageController controller;
     
-    @Mock OrderSchedulerService service;
+    @Mock OrderProgressManagementRemote orderProgressManagement;
+    @Mock OperatorTasksRemote operatorTasksProvider;
+    
     @Inject Collection<FacesMessage> messages = new HashSet<FacesMessage>();
     @Inject OperatorsupportI18n i18n = new OperatorsupportI18n(new ResourceBundleWithAnyKey());
     
@@ -58,7 +60,7 @@ public class OrdersListPageControllerTest {
                 new OrderKey("123456789", "H2", "2013"),
                 new OrderKey("987654321", "A3", "2013")
                 );
-        Mockito.when(service.getOrderSequence(operator)).thenReturn(expected);
+        Mockito.when(operatorTasksProvider.getOrderSequence(operator)).thenReturn(expected);
         
         controller.setOperator(operator);
         List<OrderKey> displayedOrders = controller.getOrders();
@@ -77,8 +79,8 @@ public class OrdersListPageControllerTest {
                 new OrderKey("000000000", "X1", "2013")
                 );
         
-        Mockito.when(service.getOrderSequence(not(eq(operator)))).thenReturn(notExpected);
-        Mockito.when(service.getOrderSequence(operator)).thenReturn(expected);
+        Mockito.when(operatorTasksProvider.getOrderSequence(not(eq(operator)))).thenReturn(notExpected);
+        Mockito.when(operatorTasksProvider.getOrderSequence(operator)).thenReturn(expected);
         
         controller.setOperator(operator);
         List<OrderKey> displayedOrders = controller.getOrders();
@@ -111,6 +113,6 @@ public class OrdersListPageControllerTest {
         
         controller.orderDone(orderKey);
         
-        Mockito.verify(service).markOrderAsProcessed(orderKey);
+        Mockito.verify(orderProgressManagement).orderDone(orderKey);
     }
 }

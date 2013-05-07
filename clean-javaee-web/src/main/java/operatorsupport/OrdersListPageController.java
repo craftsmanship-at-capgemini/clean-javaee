@@ -9,7 +9,7 @@ import javax.faces.application.FacesMessage;
 import javax.inject.Inject;
 
 import orderprocessing.OrderKey;
-import orderprocessing.scheduling.OrderSchedulerRemote;
+import orderprocessing.OrderProgressManagementRemote;
 import web.Action;
 import web.CookieParam;
 import web.Messages;
@@ -36,7 +36,8 @@ public class OrdersListPageController {
         return new Outcome(OrdersListPageController.class).build();
     }
     
-    @EJB OrderSchedulerRemote orderScheduler;
+    @EJB OrderProgressManagementRemote orderProgressManagement;
+    @EJB OperatorTasksRemote operatorTasks;
     
     @Inject @Messages Collection<FacesMessage> messages;
     @Inject OperatorsupportI18n i18n;
@@ -47,7 +48,7 @@ public class OrdersListPageController {
     public List<OrderKey> getOrders() {
         if (orders == null) {
             if (isOperatorCookieDefined()) {
-                orders = orderScheduler.getOrderSequence(operator);
+                orders = operatorTasks.getOrderSequence(operator);
             } else {
                 FacesMessage message = i18n.cookieNotDefinedMessage(
                         FacesMessage.SEVERITY_ERROR,
@@ -74,7 +75,7 @@ public class OrdersListPageController {
     
     @Action
     public void orderDone(OrderKey orderKey) {
-        orderScheduler.markOrderAsProcessed(orderKey);
+        orderProgressManagement.orderDone(orderKey);
     }
     
     @Action
