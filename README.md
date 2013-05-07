@@ -45,7 +45,14 @@ Project works out of the box with last IntelliJ Ultimate Edition (Free 30-day tr
 
 
 # 3. Testability
-- 
+- dependencies types: inherit, instantiate, calls-static-member
+- dependency to infrastructure: database, file system, servlet context, remote service, etc.
+- JSF Controller (tag: testability-1)
+- problem mitigation: method extraction + self mocking
+- avoiding transitive dependences with injection of value objects
+- JSF Controller + FacesUtils (tag: testability-2)
+- avoiding transitive dependences with injection of services covering infrastructure
+
 
 
 # 4. Extras
