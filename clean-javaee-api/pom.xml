@@ -4,7 +4,7 @@
     <parent>
         <groupId>craftsmanship-at-capgemini</groupId>
         <artifactId>clean-javaee</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-RC1</version>
     </parent>
     <name>clean-javaee API module</name>
     <artifactId>clean-javaee-api</artifactId>
@@ -13,7 +13,7 @@
         <dependency>
             <groupId>eternity</groupId>
             <artifactId>common-testing</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>1.0-RC1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

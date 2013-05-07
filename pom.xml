@@ -4,11 +4,11 @@
     <parent>
         <groupId>craftsmanship-at-capgemini</groupId>
         <artifactId>common-build</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>1.0-RC1</version>
         <relativePath>parent-pom.xml</relativePath>
     </parent>
     <artifactId>clean-javaee</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-RC1</version>
     <packaging>pom</packaging>
     <name>Example of clean &amp; testable Java EE application</name>
     <modules>
@@ -27,7 +27,7 @@
         <connection>https://github.com/craftsmanship-at-capgemini/clean-javaee.git</connection>
         <developerConnection>scm:git:git@github.com:craftsmanship-at-capgemini/clean-javaee.git</developerConnection>
         <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
-        <tag>HEAD</tag>
+        <tag>master</tag>
     </scm>
     <repositories>
         <repository>
