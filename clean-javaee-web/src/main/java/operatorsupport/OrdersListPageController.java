@@ -1,19 +1,21 @@
 package operatorsupport;
 
-import java.util.Collection;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
-import javax.inject.Inject;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.Cookie;
 
 import orderprocessing.OrderKey;
 import orderprocessing.OrderProgressManagementRemote;
 import web.Action;
-import web.CookieParam;
-import web.Messages;
-import web.Outcome;
 import web.PageController;
 
 /**
@@ -32,45 +34,36 @@ public class OrdersListPageController {
     
     private static final String OPERATOR_KEY_COOKIE = "operatorKey";
     
-    public static String outcome() {
-        return new Outcome(OrdersListPageController.class).build();
-    }
-    
     @EJB OrderProgressManagementRemote orderProgressManagement;
     @EJB OperatorTasksRemote operatorTasks;
     
-    @Inject @Messages Collection<FacesMessage> messages;
-    @Inject OperatorsupportI18n i18n;
-    
-    private String operator;
     private List<OrderKey> orders;
     
     public List<OrderKey> getOrders() {
         if (orders == null) {
-            if (isOperatorCookieDefined()) {
+            // get cookie
+            Map<String, Object> cookieMap = FacesContext
+                    .getCurrentInstance().getExternalContext()
+                    .getRequestCookieMap();
+            Cookie cookie = (Cookie) cookieMap.get(OPERATOR_KEY_COOKIE);
+            String operator = cookie.getValue();
+            // if cooky defined
+            if (operator != null && !operator.isEmpty()) {
                 orders = operatorTasks.getOrderSequence(operator);
             } else {
-                FacesMessage message = i18n.cookieNotDefinedMessage(
+                // get localized message
+                ResourceBundle bundle = FacesContext.getCurrentInstance().
+                        getApplication().getResourceBundle(FacesContext.getCurrentInstance(), "messagesBundle");
+                FacesMessage message = new FacesMessage(
                         FacesMessage.SEVERITY_ERROR,
-                        OPERATOR_KEY_COOKIE);
-                messages.add(message);
+                        MessageFormat.format(bundle.getString("cookieNotDefinedMessage"), OPERATOR_KEY_COOKIE),
+                        MessageFormat.format(bundle.getString("cookieNotDefinedMessage_detail"), OPERATOR_KEY_COOKIE));
+                // add message
+                FacesContext.getCurrentInstance().addMessage(null, message);
                 orders = Collections.emptyList();
             }
         }
         return orders;
-    }
-    
-    public boolean isOperatorCookieDefined() {
-        return !(operator == null || operator.isEmpty());
-    }
-    
-    public String getOperator() {
-        return operator;
-    }
-    
-    @Inject
-    public void setOperator(@CookieParam(OPERATOR_KEY_COOKIE) String operator) {
-        this.operator = operator;
     }
     
     @Action
@@ -80,11 +73,22 @@ public class OrdersListPageController {
     
     @Action
     public String startBreak() {
-        if (isOperatorCookieDefined()) {
-            // e.g. log to operator performance database
-            return OperatorBreakPageController.outcome(operator);
+        Map<String, Object> cookieMap = FacesContext
+                .getCurrentInstance().getExternalContext()
+                .getRequestCookieMap();
+        Cookie cookie = (Cookie) cookieMap.get(OPERATOR_KEY_COOKIE);
+        String operator = cookie.getValue();
+        if (operator != null && !operator.isEmpty()) {
+            // build outcome
+            try {
+                return "/operator-break?faces-redirect=true&amp; operator=" + URLEncoder.encode(operator, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // "UTF-8" is supported
+                throw new AssertionError(e);
+            }
         } else {
-            return Outcome.stayOnPage();
+            // stay on page
+            return null;
         }
     }
     
