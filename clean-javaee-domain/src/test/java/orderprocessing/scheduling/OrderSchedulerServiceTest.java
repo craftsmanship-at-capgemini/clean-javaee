@@ -71,7 +71,7 @@ public class OrderSchedulerServiceTest {
         service.assignmentRules = assignmentRules;
         service.makeScheduleForToday();
         
-        verify(repository, times(3)).persistOrderSequence(
+        verify(repository, times(3)).persistOrderProcessingSequence(
                 operatorCaptor.capture(),
                 sequenceCaptor.capture());
         
@@ -114,7 +114,7 @@ public class OrderSchedulerServiceTest {
         service.assignmentRules = assignmentRules;
         service.makeScheduleForToday();
         
-        verify(repository, times(3)).persistOrderSequence(
+        verify(repository, times(3)).persistOrderProcessingSequence(
                 operatorCaptor.capture(),
                 sequenceCaptor.capture());
         

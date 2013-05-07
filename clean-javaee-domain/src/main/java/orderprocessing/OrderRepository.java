@@ -53,15 +53,15 @@ public class OrderRepository {
                         param("scheduled", OrderState.SCHEDULED));
     }
     
-    public void deleteOrderSequences() {
+    public void deleteAllOrderSequences() {
         entityManager.createQuery("delete from SequenceElementEntity os").
                 executeUpdate();
     }
     
-    public void persistOrderSequence(String operator, List<OrderKey> sequence) {
-        for (int sequenceNumber = 0; sequenceNumber < sequence.size(); sequenceNumber++) {
+    public void persistOrderProcessingSequence(String operator, List<OrderKey> orderKeysSequence) {
+        for (int sequenceNumber = 0; sequenceNumber < orderKeysSequence.size(); sequenceNumber++) {
             SequenceElementEntity entity =
-                    new SequenceElementEntity(operator, sequenceNumber, sequence.get(sequenceNumber));
+                    new SequenceElementEntity(operator, sequenceNumber, orderKeysSequence.get(sequenceNumber));
             entityManager.persist(entity);
         }
     }

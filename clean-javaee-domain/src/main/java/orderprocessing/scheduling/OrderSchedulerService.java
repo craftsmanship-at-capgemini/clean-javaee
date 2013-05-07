@@ -37,50 +37,54 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
     @Inject @Configuration Set<AssignmentRule> assignmentRules;
     
     /**
+     * Creates a schedule of order processing for operators. Finds open orders
+     * and tries to assign them for processing to an appropriate operator.
+     * 
+     * Performs the following steps:
      * <ol>
-     * <li>treat scheduled but not processed orders as open</li>
-     * <li>read open orders</li>
-     * <li>split orders between operators</li>
-     * <li>assignment needs to respect the following rules:</li> 
+     * <li>read all open orders (treat scheduled but not processed orders as
+     * open)</li>
+     * <li>assign read orders to different operators - assignment must comply
+     * with the following rules:</li>
      * <ul>
-     * <li>operator kasia doesn't process orders from category A1 and with item like</li>
-     * 'tv*'
+     * <li>operator kasia doesn't process orders from category A1 and with item
+     * like 'tv*'</li>
      * <li>operator krzysiek processes all orders</li>
      * <li>operator michal processes only orders from category A1</li>
+     * <li>assignment should be balanced between all operators based on sum of
+     * items</li>
      * </ul>
-     * <li>assignment should be balanced based on sum of items</li>
-     * <li>mark orders as scheduled</li>
+     * <li>mark assigned orders as scheduled</li>
+     * <li>delete existing Order Processing Sequences</li>
+     * <li>save the determined Order Processing Sequences (also called
+     * "schedule") for each operator</li>
      * </ol>
      */
     @Schedule(hour = "4")
     protected void makeScheduleForToday() {
         List<OrderEntity> openOrders = orderRepository.findNotDoneOrders();
-        Assignments assignments = new Assignments(operators);
+        OperatorOrderAssignments operatorAssignments = new OperatorOrderAssignments(operators);
         for (OrderEntity order : openOrders) {
-            AssignmentOptions assignmentOptions = new AssignmentOptions(operators);
-            OPERATOR_LOOP: //
-            for (String operator : operators) {
-                for (AssignmentRule rule : assignmentRules) {
-                    boolean isRulePassed = rule.canPrepareOrder(operator, order);
-                    if (!isRulePassed) {
-                        assignmentOptions.cantPrepareOrder(operator);
-                        continue OPERATOR_LOOP;
-                    }
-                }
-            }
-            Set<String> possibleOperators = assignmentOptions.getPossibleOperators();
-            if (!possibleOperators.isEmpty()) {
-                String assignedOperator =
-                        assignments.operatorWithMinUtilization(possibleOperators);
-                assignments.assign(assignedOperator, order.getOrderKey(),
+            Set<String> possibleOperatorsForOrder = determinePossibleOperatorsForOrder(order);
+            if (!possibleOperatorsForOrder.isEmpty()) {
+                String operatorToAssign = operatorAssignments
+                        .retrieveOperatorWithMinUtilization(possibleOperatorsForOrder);
+                operatorAssignments.assignOrderToOperator(operatorToAssign, order.getOrderKey(),
                         calculateOrderPreparationCost(order));
                 order.markAsScheduled();
             }
         }
-        orderRepository.deleteOrderSequences();
+        orderRepository.deleteAllOrderSequences();
         for (String operator : operators) {
-            orderRepository.persistOrderSequence(operator, assignments.getAssignments(operator));
+            orderRepository.persistOrderProcessingSequence(operator,
+                    operatorAssignments.getOrderKeysOfOperator(operator));
         }
+    }
+
+    private Set<String> determinePossibleOperatorsForOrder(OrderEntity order) {
+        RulesWhichOperatorCanPrepareOrder canOperatorPrepareOrderRules = new RulesWhichOperatorCanPrepareOrder(
+                operators, assignmentRules, order);
+        return canOperatorPrepareOrderRules.getOperatorsAllowedToPrepareOrder();
     }
     
     private int calculateOrderPreparationCost(OrderEntity order) {
@@ -103,65 +107,82 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
     
 }
 
-class Assignments {
-    Map<String, List<OrderKey>> assignments;
-    Map<String, Integer> utilization;
+class OperatorOrderAssignments {
+    Map<String, List<OrderKey>> orderKeysByOperator;
+    Map<String, Integer> utilizationOfOperator;
     
-    public Assignments(Set<String> operators) {
-        this.assignments = new HashMap<String, List<OrderKey>>(operators.size());
+    public OperatorOrderAssignments(Set<String> operators) {
+        this.orderKeysByOperator = new HashMap<String, List<OrderKey>>(operators.size());
         for (String operator : operators) {
-            assignments.put(operator, new LinkedList<OrderKey>());
+            orderKeysByOperator.put(operator, new LinkedList<OrderKey>());
         }
-        utilization = new HashMap<String, Integer>(operators.size());
+        utilizationOfOperator = new HashMap<String, Integer>(operators.size());
         for (String operator : operators) {
-            utilization.put(operator, 0);
+            utilizationOfOperator.put(operator, 0);
         }
     }
     
-    public String operatorWithMinUtilization(Set<String> operators) {
+    public String retrieveOperatorWithMinUtilization(Set<String> operators) {
         String operatorWithMinUtilization = null;
         int minUtilization = Integer.MAX_VALUE;
         
         for (String operator : operators) {
-            if (utilization.get(operator) < minUtilization) {
-                minUtilization = utilization.get(operator);
+            if (utilizationOfOperator.get(operator) < minUtilization) {
+                minUtilization = utilizationOfOperator.get(operator);
                 operatorWithMinUtilization = operator;
             }
         }
         return operatorWithMinUtilization;
     }
     
-    public void assign(String assignedOperator, OrderKey orderKey, int orderPreparationCost) {
-        assignments.get(assignedOperator).add(orderKey);
-        int currentUtilization = utilization.get(assignedOperator);
-        utilization.put(assignedOperator, currentUtilization + orderPreparationCost);
+    public void assignOrderToOperator(String assignedOperator, OrderKey orderKey, int orderPreparationCost) {
+        orderKeysByOperator.get(assignedOperator).add(orderKey);
+        int currentUtilization = utilizationOfOperator.get(assignedOperator);
+        utilizationOfOperator.put(assignedOperator, currentUtilization + orderPreparationCost);
         
     }
     
-    public List<OrderKey> getAssignments(String operator) {
-        return assignments.get(operator);
+    public List<OrderKey> getOrderKeysOfOperator(String operator) {
+        return orderKeysByOperator.get(operator);
     }
     
 }
 
-class AssignmentOptions {
-    Map<String, Boolean> assignmentOptions;
+class RulesWhichOperatorCanPrepareOrder {
+    Map<String, Boolean> canPrepareOrderFlagByOperator;
     
-    public AssignmentOptions(Set<String> operators) {
-        this.assignmentOptions = new HashMap<String, Boolean>(operators.size());
+    public RulesWhichOperatorCanPrepareOrder(Set<String> operators, Set<AssignmentRule> assignmentRules,
+            OrderEntity order) {
+        this.canPrepareOrderFlagByOperator = new HashMap<String, Boolean>(operators.size());
+
+        markOperatorsAsAllowedToPrepareOrderByDefault(operators);
+
+        OPERATOR_LOOP: //
         for (String operator : operators) {
-            assignmentOptions.put(operator, true);
+            for (AssignmentRule rule : assignmentRules) {
+                boolean isRulePassed = rule.canPrepareOrder(operator, order);
+                if (!isRulePassed) {
+                    markOperatorAsNotAllowedToPrepareOrder(operator);
+                    continue OPERATOR_LOOP;
+                }
+            }
+        }
+    }
+
+    private void markOperatorsAsAllowedToPrepareOrderByDefault(Set<String> operators) {
+        for (String operator : operators) {
+            canPrepareOrderFlagByOperator.put(operator, true);
         }
     }
     
-    public void cantPrepareOrder(String operator) {
-        assignmentOptions.put(operator, false);
+    private void markOperatorAsNotAllowedToPrepareOrder(String operator) {
+        canPrepareOrderFlagByOperator.put(operator, false);
     }
     
-    public Set<String> getPossibleOperators() {
+    public Set<String> getOperatorsAllowedToPrepareOrder() {
         Set<String> operators = new HashSet<String>();
-        for (String operator : assignmentOptions.keySet()) {
-            if (assignmentOptions.get(operator)) {
+        for (String operator : canPrepareOrderFlagByOperator.keySet()) {
+            if (canPrepareOrderFlagByOperator.get(operator)) {
                 operators.add(operator);
             }
         }
