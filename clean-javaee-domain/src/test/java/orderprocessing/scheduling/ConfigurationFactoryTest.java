@@ -35,6 +35,7 @@ public class ConfigurationFactoryTest {
         OrderEntity orderA1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
                 withOrderKey("0123123123", "A1", "2013").build();
         
+        // REV3: static import?
         Assert.assertTrue(rule.canPrepareOrder("łukasz", orderA1));
         Assert.assertTrue(rule.canPrepareOrder("łukasz", orderA2));
         Assert.assertTrue(rule.canPrepareOrder("michal", orderA1));
