@@ -80,16 +80,6 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
                     operatorAssignments.getOrderKeysOfOperator(operator));
         }
     }
-
-    private Set<String> determinePossibleOperatorsForOrder(OrderEntity order) {
-        RulesWhichOperatorCanPrepareOrder canOperatorPrepareOrderRules = new RulesWhichOperatorCanPrepareOrder(
-                operators, assignmentRules, order);
-        return canOperatorPrepareOrderRules.getOperatorsAllowedToPrepareOrder();
-    }
-    
-    private int calculateOrderPreparationCost(OrderEntity order) {
-        return order.getOrderLines().size();
-    }
     
     @Override
     public void orderDone(OrderKey orderKey) {
@@ -103,6 +93,16 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
             // if order could by deleted in meanwhile and should not by
             // processed start emergency procedures e.g. send email to manager
         }
+    }
+    
+    private Set<String> determinePossibleOperatorsForOrder(OrderEntity order) {
+        RulesWhichOperatorCanPrepareOrder canOperatorPrepareOrderRules = new RulesWhichOperatorCanPrepareOrder(
+                operators, assignmentRules, order);
+        return canOperatorPrepareOrderRules.getOperatorsAllowedToPrepareOrder();
+    }
+    
+    private int calculateOrderPreparationCost(OrderEntity order) {
+        return order.getOrderLines().size();
     }
     
 }
@@ -154,29 +154,18 @@ class RulesWhichOperatorCanPrepareOrder {
     public RulesWhichOperatorCanPrepareOrder(Set<String> operators, Set<AssignmentRule> assignmentRules,
             OrderEntity order) {
         this.canPrepareOrderFlagByOperator = new HashMap<String, Boolean>(operators.size());
-
+        
         markOperatorsAsAllowedToPrepareOrderByDefault(operators);
-
-        OPERATOR_LOOP: //
+        
         for (String operator : operators) {
             for (AssignmentRule rule : assignmentRules) {
                 boolean isRulePassed = rule.canPrepareOrder(operator, order);
                 if (!isRulePassed) {
                     markOperatorAsNotAllowedToPrepareOrder(operator);
-                    continue OPERATOR_LOOP;
+                    break;
                 }
             }
         }
-    }
-
-    private void markOperatorsAsAllowedToPrepareOrderByDefault(Set<String> operators) {
-        for (String operator : operators) {
-            canPrepareOrderFlagByOperator.put(operator, true);
-        }
-    }
-    
-    private void markOperatorAsNotAllowedToPrepareOrder(String operator) {
-        canPrepareOrderFlagByOperator.put(operator, false);
     }
     
     public Set<String> getOperatorsAllowedToPrepareOrder() {
@@ -187,5 +176,15 @@ class RulesWhichOperatorCanPrepareOrder {
             }
         }
         return operators;
+    }
+    
+    private void markOperatorsAsAllowedToPrepareOrderByDefault(Set<String> operators) {
+        for (String operator : operators) {
+            canPrepareOrderFlagByOperator.put(operator, true);
+        }
+    }
+    
+    private void markOperatorAsNotAllowedToPrepareOrder(String operator) {
+        canPrepareOrderFlagByOperator.put(operator, false);
     }
 }
