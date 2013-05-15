@@ -33,6 +33,5 @@ public class OperatorBreakPageController {
     
     public void setOperator(String operator) {
         this.operator = operator;
-        
     }
 }

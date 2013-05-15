@@ -152,7 +152,7 @@ public class OrderRepositoryTest {
     }
     
     @Test
-    public void shouldReturnsEmptyListWhenCustomerHasNoOrders() {
+    public void shouldReturnEmptyListWhenCustomerHasNoOrders() {
         CustomerKey customerKey = new CustomerKey(13L);
         persistenceUnit.persist(
                 OrderBuilder.anOrder().likeSomeNew8ROrder().build(),
@@ -167,7 +167,7 @@ public class OrderRepositoryTest {
     }
     
     @Test
-    public void shouldReturnsEmptyListWhenCustomerNotExists() {
+    public void shouldReturnEmptyListWhenCustomerNotExists() {
         CustomerKey customerKey = new CustomerKey(13L);
         persistenceUnit.persist(
                 OrderBuilder.anOrder().likeSomeNew8ROrder().build(),
@@ -180,14 +180,14 @@ public class OrderRepositoryTest {
     }
     
     @Test
-    public void shouldWorksWithoutErrorWhenNoOrdersInSystem() {
+    public void shouldWorkWithoutErrorWhenNoOrdersInSystem() {
         persistenceUnit.begin();
         orderRepository.deleteClosedOrders();
         persistenceUnit.commit();
     }
     
     @Test
-    public void shouldDoNothingWhenThereIsNonClosedOrder() {
+    public void shouldKeepAllNonClosedOrdersWhenDeletingClosedOrders() {
         OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
                 withOrderState(OrderState.SCHEDULED).build();
         OrderEntity expected2 = OrderBuilder.anOrder().likeSomeProcessed7KOrder().
@@ -209,7 +209,7 @@ public class OrderRepositoryTest {
     }
     
     @Test
-    public void shouldDeleteClosedOrders() {
+    public void shouldDeleteClosedOrdersOnlyAndKeepTheSheduledOrder() {
         OrderEntity orderToDelete1 = OrderBuilder.anOrder().likeSomeNew8ROrder()
                 .withOrderKey(favoriteOrderKey)
                 .withOrderState(OrderState.CLOSED).build();
@@ -232,11 +232,12 @@ public class OrderRepositoryTest {
     }
     
     @Test
-    public void shouldFindOpenOrderWhenManyExists() throws NotFoundException {
+    public void shouldFindMultipleOpenOrdersWhenProcessedAndClosedOrdersExistAsWell() throws NotFoundException {
         OrderEntity expected1 = OrderBuilder.anOrder().likeSomeNew8ROrder().
                 withOrderKey("123456789", "AA", "2013").withOrderState(OrderState.OPEN).build();
         OrderEntity expected2 = OrderBuilder.anOrder().likeSomeNew8ROrder().
                 withOrderKey("012345678", "AA", "2013").withOrderState(OrderState.OPEN).build();
+        // REV3: why not create all orders here as throughout the whole test class?
         persistenceUnit.persist(
                 OrderBuilder.anOrder().likeSomeNew8ROrder().
                         withOrderState(OrderState.PROCESSED).build(),
