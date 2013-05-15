@@ -1,6 +1,3 @@
-/**
- * 
- */
 package orderprocessing.scheduling;
 
 import static org.fest.assertions.api.Assertions.assertThat;

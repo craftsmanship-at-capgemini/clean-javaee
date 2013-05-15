@@ -1,6 +1,3 @@
-/**
- * 
- */
 package operatorsupport;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -35,7 +32,7 @@ public class OperatorTaskDaoTest {
     }
     
     @Test
-    public void schouldReturnSequenceForMichalWhenOneSimpleSequenceExists() {
+    public void shouldReturnSequenceForMichalWhenOneSimpleSequenceExists() {
         String operator = "michal";
         OrderKey[] expected = {
                 new OrderKey("123456789", "A1", "2013"),
@@ -52,7 +49,7 @@ public class OperatorTaskDaoTest {
     }
     
     @Test
-    public void schouldReturnEmptySequenceWhenNoSequenceIsDefinedForGivenOperator() {
+    public void shouldReturnEmptySequenceWhenNoSequenceIsDefinedForGivenOperator() {
         String operator = "michal";
         String theOther = "krzysztof";
         persistenceUnit.persist(
@@ -65,7 +62,7 @@ public class OperatorTaskDaoTest {
     }
     
     @Test
-    public void schouldReturnSequenceForCorrectOperatorWhenNoSequenceIsDefinedForGivenOperator() {
+    public void shouldReturnSequenceForCorrectOperatorWhenNoSequenceIsDefinedForGivenOperator() {
         String operator = "michal";
         String theOther = "krzysztof";
         OrderKey[] expected = {
