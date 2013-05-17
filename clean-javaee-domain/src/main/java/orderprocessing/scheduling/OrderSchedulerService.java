@@ -63,6 +63,12 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
     @Schedule(hour = "4")
     protected void makeScheduleForToday() {
         List<OrderEntity> openOrders = orderRepository.findNotDoneOrders();
+        OperatorOrderAssignments operatorAssignments = assignOrdersToOperators(openOrders);
+        orderRepository.deleteAllOrderSequences();
+        saveNewOrderProcessingSequences(operatorAssignments);
+    }
+
+    private OperatorOrderAssignments assignOrdersToOperators(List<OrderEntity> openOrders) {
         OperatorOrderAssignments operatorAssignments = new OperatorOrderAssignments(operators);
         for (OrderEntity order : openOrders) {
             Set<String> possibleOperatorsForOrder = determinePossibleOperatorsForOrder(order);
@@ -74,7 +80,10 @@ public class OrderSchedulerService implements OrderProgressManagementRemote {
                 order.markAsScheduled();
             }
         }
-        orderRepository.deleteAllOrderSequences();
+        return operatorAssignments;
+    }
+    
+    private void saveNewOrderProcessingSequences(OperatorOrderAssignments operatorAssignments) {
         for (String operator : operators) {
             orderRepository.persistOrderProcessingSequence(operator,
                     operatorAssignments.getOrderKeysOfOperator(operator));
