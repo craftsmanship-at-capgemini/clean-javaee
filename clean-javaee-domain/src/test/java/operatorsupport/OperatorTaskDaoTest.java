@@ -1,8 +1,6 @@
-/**
- * 
- */
 package operatorsupport;
 
+import static orderprocessing.OrderSequenceBuilder.anOrderProcessingSequence;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
@@ -10,7 +8,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import orderprocessing.OrderKey;
-import orderprocessing.OrderSequenceBuilder;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,7 +24,7 @@ public class OperatorTaskDaoTest {
     
     @Rule public TestingPersistenceUnit persistenceUnit = new TestingPersistenceUnit("clean-javaee-test-db");
     
-    @Inject OperatorTaskDao operatorTaskDao;
+    @Inject OperatorTaskDao operatorTaskDaoUnderTest;
     
     @Before
     public void setUp() throws Exception {
@@ -36,51 +33,60 @@ public class OperatorTaskDaoTest {
     
     @Test
     public void schouldReturnSequenceForMichalWhenOneSimpleSequenceExists() {
+        // given
         String operator = "michal";
-        OrderKey[] expected = {
+        OrderKey[] expectedOrderProcessingSequence = {
                 new OrderKey("123456789", "A1", "2013"),
                 new OrderKey("987654321", "A2", "2013"),
-                new OrderKey("564738291", "A1", "2013"),
-        };
+                new OrderKey("564738291", "A1", "2013") };
+        
         persistenceUnit.persist(
-                OrderSequenceBuilder.anOrderSequence(operator).
-                        withOrders(expected).build());
+                anOrderProcessingSequence(operator).
+                        withOrders(expectedOrderProcessingSequence).build());
+        // when
+        List<OrderKey> actualOrderProcessingSequence = operatorTaskDaoUnderTest.getOrderSequence(operator);
         
-        List<OrderKey> sequence = operatorTaskDao.getOrderSequence(operator);
-        
-        assertThat(sequence).containsExactly(expected);
+        // then
+        assertThat(actualOrderProcessingSequence).containsExactly(expectedOrderProcessingSequence);
     }
     
     @Test
     public void schouldReturnEmptySequenceWhenNoSequenceIsDefinedForGivenOperator() {
+        // given
         String operator = "michal";
-        String theOther = "krzysztof";
+        String otherOperator = "krzysztof";
+        
         persistenceUnit.persist(
-                OrderSequenceBuilder.anOrderSequence(theOther).
+                anOrderProcessingSequence(otherOperator).
                         withSomeOrders().build());
         
-        List<OrderKey> sequence = operatorTaskDao.getOrderSequence(operator);
+        // when
+        List<OrderKey> actualOrderProcessingSequence = operatorTaskDaoUnderTest.getOrderSequence(operator);
         
-        assertThat(sequence).isEmpty();
+        // then
+        assertThat(actualOrderProcessingSequence).isEmpty();
     }
     
     @Test
     public void schouldReturnSequenceForCorrectOperatorWhenNoSequenceIsDefinedForGivenOperator() {
+        // given
         String operator = "michal";
-        String theOther = "krzysztof";
-        OrderKey[] expected = {
+        String otherOperator = "krzysztof";
+        OrderKey[] expectedOrderProcessingSequence = {
                 new OrderKey("123456789", "A1", "2013"),
                 new OrderKey("987654321", "A2", "2013"),
-                new OrderKey("564738291", "A1", "2013"),
-        };
+                new OrderKey("564738291", "A1", "2013") };
+        
         persistenceUnit.persist(
-                OrderSequenceBuilder.anOrderSequence(operator).
-                        withOrders(expected).build(),
-                OrderSequenceBuilder.anOrderSequence(theOther).
+                anOrderProcessingSequence(operator).
+                        withOrders(expectedOrderProcessingSequence).build(),
+                anOrderProcessingSequence(otherOperator).
                         withSomeOrders().build());
         
-        List<OrderKey> sequence = operatorTaskDao.getOrderSequence(operator);
+        // when
+        List<OrderKey> actualOrderProcessingSequence = operatorTaskDaoUnderTest.getOrderSequence(operator);
         
-        assertThat(sequence).containsExactly(expected);
+        // then
+        assertThat(actualOrderProcessingSequence).containsExactly(expectedOrderProcessingSequence);
     }
 }

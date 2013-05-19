@@ -50,6 +50,10 @@ public class OrderBuilder {
         return this;
     }
     
+    public OrderBuilder but() {
+        return this;
+    }
+    
     public OrderBuilder withOrderKey(OrderKey orderKey) {
         this.orderKey = orderKey;
         return this;

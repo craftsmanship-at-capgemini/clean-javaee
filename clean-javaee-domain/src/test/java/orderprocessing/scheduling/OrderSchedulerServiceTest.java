@@ -3,8 +3,9 @@
  */
 package orderprocessing.scheduling;
 
+import static orderprocessing.OrderBuilder.anOrder;
+import static orderprocessing.scheduling.OrderSequencesAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.data.MapEntry.entry;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,10 +14,8 @@ import inventory.ItemKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -33,7 +32,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.Whitebox;
 
 import testing.Testing;
 
@@ -43,7 +41,8 @@ import testing.Testing;
  */
 public class OrderSchedulerServiceTest {
     
-    @Inject OrderSchedulerService service;
+    @Inject OrderSchedulerService orderSchedulerServiceUnderTest;
+    
     @Mock OrderRepository repository;
     @Captor ArgumentCaptor<String> operatorCaptor;
     @Captor ArgumentCaptor<List<OrderKey>> sequenceCaptor;
@@ -58,91 +57,80 @@ public class OrderSchedulerServiceTest {
     
     @Test
     public void shouldAssignSingleOrderToKrzysztof() {
+        // given
         OrderKey orderKeyNotProcessedByMichal = new OrderKey("0123123123", "A2", "213");
         ItemKey itemKeyNotProcessedByKasia = new ItemKey("tv-sams-54003-42");
-        OrderEntity order = OrderBuilder.anOrder().likeSomeNew8ROrder().
+        List<OrderKey> expectedSequence = Collections.singletonList(orderKeyNotProcessedByMichal);
+        List<OrderKey> emptySequence = Collections.emptyList();
+        
+        OrderEntity orderToSchedule = anOrder().likeSomeNew8ROrder().but().
                 withOrderState(OrderState.OPEN).
                 withOrderKey(orderKeyNotProcessedByMichal).
                 withOrderLine(itemKeyNotProcessedByKasia, 1).build();
-        when(repository.findNotDoneOrders()).thenReturn(Arrays.asList(order));
         
-        Whitebox.setInternalState( service, "operators", operators );
-        service.operators = operators;
-        service.assignmentRules = assignmentRules;
-        service.makeScheduleForToday();
+        when(repository.findNotDoneOrders()).thenReturn(Collections.singletonList(orderToSchedule));
         
+        // when
+        orderSchedulerServiceUnderTest.operators = operators;
+        orderSchedulerServiceUnderTest.assignmentRules = assignmentRules;
+        orderSchedulerServiceUnderTest.makeScheduleForToday();
+        
+        // then
         verify(repository, times(3)).persistOrderProcessingSequence(
                 operatorCaptor.capture(),
                 sequenceCaptor.capture());
         
-        List<OrderKey> expectedSequence = Collections.singletonList(orderKeyNotProcessedByMichal);
-        List<OrderKey> emptySequence = Collections.emptyList();
+        assertThat(operatorCaptor, sequenceCaptor).
+                operatorHasSequence("michal", emptySequence).
+                operatorHasSequence("krzysztof", expectedSequence).
+                operatorHasSequence("kasia", emptySequence);
         
-        Map<String, List<OrderKey>> orderKeySequenceByOperatorMap = buildOrderKeySequenceByOperatorMap(
-                operatorCaptor.getAllValues(), sequenceCaptor.getAllValues());
-        assertThat(orderKeySequenceByOperatorMap)
-            .contains(
-                entry("krzysztof", expectedSequence),
-                entry("michal", emptySequence), 
-                entry("kasia", emptySequence)
-            );
-        
-        assertThat(order.getOrderState()).isEqualTo(OrderState.SCHEDULED);
+        assertThat(orderToSchedule.getOrderState()).isEqualTo(OrderState.SCHEDULED);
     }
     
     @Test
     public void shouldAssignAllOrders() {
+        // given
         List<OrderKey> expectedOrderKeys = Arrays.asList(
                 new OrderKey("123456789", "H2", "2013"),
                 new OrderKey("987654321", "A1", "2013"),
                 new OrderKey("012345678", "AA", "2013"));
         
-        List<OrderEntity> ordersToSchedule = Arrays.asList(
-                OrderBuilder.anOrder().likeSomeNew8ROrder().
-                        withOrderKey(expectedOrderKeys.get(0)).
-                        withOrderState(OrderState.OPEN).build(),
-                OrderBuilder.anOrder().likeSomeNew8ROrder().
-                        withOrderKey(expectedOrderKeys.get(1)).
-                        withOrderState(OrderState.OPEN).build(),
-                OrderBuilder.anOrder().likeSomeNew8ROrder().
-                        withOrderKey(expectedOrderKeys.get(2)).
-                        withOrderState(OrderState.OPEN).build()
-                );
+        List<OrderEntity> ordersToSchedule = createOpenOrdersWithKeys(expectedOrderKeys);
+        
         when(repository.findNotDoneOrders()).thenReturn(ordersToSchedule);
         
-        service.operators = operators;
-        service.assignmentRules = assignmentRules;
-        service.makeScheduleForToday();
+        // when
+        orderSchedulerServiceUnderTest.operators = operators;
+        orderSchedulerServiceUnderTest.assignmentRules = assignmentRules;
+        orderSchedulerServiceUnderTest.makeScheduleForToday();
         
+        // then
         verify(repository, times(3)).persistOrderProcessingSequence(
                 operatorCaptor.capture(),
                 sequenceCaptor.capture());
         
-        Map<String, List<OrderKey>> orderKeySequenceByOperatorMap = buildOrderKeySequenceByOperatorMap(
-                operatorCaptor.getAllValues(), sequenceCaptor.getAllValues());
-        List<OrderKey> actualOrderKeys = new ArrayList<OrderKey>(expectedOrderKeys.size());
-        actualOrderKeys.addAll(orderKeySequenceByOperatorMap.get("krzysztof"));
-        actualOrderKeys.addAll(orderKeySequenceByOperatorMap.get("michal"));
-        actualOrderKeys.addAll(orderKeySequenceByOperatorMap.get("kasia"));
-        
-        assertThat(actualOrderKeys).containsAll(expectedOrderKeys);
-        
-        assertThat(orderKeySequenceByOperatorMap.get("michal")).hasSize(1);
-        assertThat(orderKeySequenceByOperatorMap.get("krzysztof")).hasSize(1);
-        assertThat(orderKeySequenceByOperatorMap.get("kasia")).hasSize(1);
+        assertThat(operatorCaptor, sequenceCaptor).
+                areAllKeysScheduled(expectedOrderKeys).
+                operatorSequenceHasSize("michal", 1).
+                operatorSequenceHasSize("krzysztof", 1).
+                operatorSequenceHasSize("kasia", 1);
         
         for (OrderEntity order : ordersToSchedule) {
             assertThat(order.getOrderState()).isEqualTo(OrderState.SCHEDULED);
         }
     }
     
-    private Map<String, List<OrderKey>> buildOrderKeySequenceByOperatorMap(List<String> operators,
-            List<List<OrderKey>> sequences) {
-        Map<String, List<OrderKey>> sequencesAsMap = new HashMap<String, List<OrderKey>>(operators.size());
-        for (int i = 0; i < operators.size(); i++) {
-            sequencesAsMap.put(operators.get(i), sequences.get(i));
+    private List<OrderEntity> createOpenOrdersWithKeys(List<OrderKey> orderKeys) {
+        OrderBuilder orderBuilder = anOrder().likeSomeNew8ROrder().but().withOrderState(OrderState.OPEN);
+        
+        List<OrderEntity> ordersToSchedule = new ArrayList<OrderEntity>(orderKeys.size());
+        for (OrderKey orderKey : orderKeys) {
+            ordersToSchedule.add(
+                    orderBuilder.but().withOrderKey(orderKey).build()
+                    );
         }
-        return sequencesAsMap;
+        return ordersToSchedule;
     }
     
     private Set<String> createOperators() {

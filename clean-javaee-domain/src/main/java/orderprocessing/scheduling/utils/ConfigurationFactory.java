@@ -1,4 +1,4 @@
-package orderprocessing.scheduling;
+package orderprocessing.scheduling.utils;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyRuntimeException;
@@ -17,11 +17,11 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 import orderprocessing.OrderEntity;
+import orderprocessing.scheduling.AssignmentRule;
 import server.Configuration;
 
 /**
- * Produces and injects configuration from file
- * orderprocessing.scheduling.ConfigurationFactory.properties.
+ * Produces and injects configuration from property file.
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
@@ -33,7 +33,7 @@ public class ConfigurationFactory {
     @Produces
     @Configuration
     String createString(InjectionPoint injectionPoint) {
-        String key = injectionPoint.getBean().getBeanClass().getName() +
+        String key = injectionPoint.getBean().getBeanClass().getName() + "." +
                 injectionPoint.getMember().getName();
         return properties.getProperty(key);
     }
@@ -41,7 +41,7 @@ public class ConfigurationFactory {
     @Produces
     @Configuration
     Set<String> createSet(InjectionPoint injectionPoint) {
-        String key = injectionPoint.getBean().getBeanClass().getName() +
+        String key = injectionPoint.getBean().getBeanClass().getName() + "." +
                 injectionPoint.getMember().getName();
         Set<String> set = new HashSet<String>(
                 Arrays.asList(properties.getProperty(key).split(",")));
@@ -51,14 +51,15 @@ public class ConfigurationFactory {
     @Produces
     @Configuration
     Set<AssignmentRule> createAssignmentRules(InjectionPoint injectionPoint) {
-        String key = injectionPoint.getBean().getBeanClass().getName() +
+        String key = injectionPoint.getBean().getBeanClass().getName() + "." +
                 injectionPoint.getMember().getName();
         Set<AssignmentRule> ruleset = new HashSet<AssignmentRule>();
         String rulesString = properties.getProperty(key);
-        for (String ruleLine : rulesString.split("\n")) {
+        String[] rules = rulesString.split(";");
+        for (String ruleLine : rules) {
             String[] ruleParts = ruleLine.split(":");
             if (ruleParts.length == 2) {
-                ruleset.add(createRule(ruleParts[0], ruleParts[1]));
+                ruleset.add(createRule(ruleParts[0].trim(), ruleParts[1].trim()));
             } else {
                 // log business rule error
             }
@@ -86,13 +87,18 @@ public class ConfigurationFactory {
                     return true;
                 }
             }
+            
+            @Override
+            public String toString() {
+                return "GroovyAssignmentRule [operator=" + ruleOperator + ", definition=<" + ruleDefinition + ">]";
+            }
         };
     }
     
     @Produces
     @Configuration
     Properties createClasspathProperties() {
-        String file = "/orderprocessing.scheduling.ConfigurationFactory.properties";
+        String file = "/orderprocessing.scheduling.utils.ConfigurationFactory.properties";
         Properties properties = new Properties();
         try {
             InputStream input =

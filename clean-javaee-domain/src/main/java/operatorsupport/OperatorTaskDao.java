@@ -12,9 +12,14 @@ import persistence.DataAccessObject;
 import persistence.EntityManagerHelper;
 import persistence.QueryParamBuilder;
 
-@DataAccessObject
+/**
+ * 
+ * @author Michal Michaluk <michaluk.michal@gmail.com>
+ * 
+ */
 @Stateless
 @LocalBean
+@DataAccessObject
 public class OperatorTaskDao implements OperatorTasksRemote {
     
     @PersistenceContext private EntityManager entityManager;

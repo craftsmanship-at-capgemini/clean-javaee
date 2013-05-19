@@ -11,7 +11,6 @@ import persistence.EntityManagerHelper;
 import persistence.NotFoundException;
 import persistence.QueryParamBuilder;
 import persistence.Repository;
-import customermanagement.CustomerKey;
 
 /**
  * 
@@ -30,10 +29,12 @@ public class OrderRepository {
                 QueryParamBuilder.withParam("orderKey", orderKey));
     }
     
-    public List<OrderEntity> findOrdersOfCustomer(CustomerKey customerKey) {
+    public List<OrderEntity> findNotDoneOrders() {
         return EntityManagerHelper.findMany(entityManager, OrderEntity.class,
-                "select o from OrderEntity o where o.customer.customerKey = :customerKey",
-                QueryParamBuilder.withParam("customerKey", customerKey));
+                "select o from OrderEntity o where o.orderState in (:open, :scheduled)",
+                QueryParamBuilder.withParams(2).
+                        param("open", OrderState.OPEN).
+                        param("scheduled", OrderState.SCHEDULED));
     }
     
     public void deleteClosedOrders() {
@@ -45,15 +46,7 @@ public class OrderRepository {
                 .executeUpdate();
     }
     
-    public List<OrderEntity> findNotDoneOrders() {
-        return EntityManagerHelper.findMany(entityManager, OrderEntity.class,
-                "select o from OrderEntity o where o.orderState in (:open, :scheduled)",
-                QueryParamBuilder.withParams(2).
-                        param("open", OrderState.OPEN).
-                        param("scheduled", OrderState.SCHEDULED));
-    }
-    
-    public void deleteAllOrderSequences() {
+    public void deleteAllOrderProcessingSequences() {
         entityManager.createQuery("delete from SequenceElementEntity os").
                 executeUpdate();
     }

@@ -16,7 +16,7 @@ public class OrderSequenceBuilder {
     private int sequenceNumber = 0;
     private List<SequenceElementEntity> sequence = new LinkedList<SequenceElementEntity>();
     
-    static public OrderSequenceBuilder anOrderSequence(String operator) {
+    static public OrderSequenceBuilder anOrderProcessingSequence(String operator) {
         OrderSequenceBuilder orderSequenceBuilder = new OrderSequenceBuilder();
         orderSequenceBuilder.operator = operator;
         return orderSequenceBuilder;

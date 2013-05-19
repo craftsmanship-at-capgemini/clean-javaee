@@ -82,6 +82,17 @@ public class OrderEntity implements Serializable {
         }
     }
     
+    public void markAsClosed() {
+        if (orderState == OrderState.PROCESSED) {
+            orderState = OrderState.CLOSED;
+            // e.g. log info to auditing database
+        } else {
+            throw new IllegalStateException("Order state transition: " +
+                    orderState + " -> " + OrderState.CLOSED +
+                    " is illegal");
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

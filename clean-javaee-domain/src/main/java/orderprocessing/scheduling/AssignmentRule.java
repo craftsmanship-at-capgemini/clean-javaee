@@ -1,6 +1,7 @@
 package orderprocessing.scheduling;
 
 import orderprocessing.OrderEntity;
+import server.BusinessRule;
 
 /**
  * <p>
@@ -18,6 +19,7 @@ import orderprocessing.OrderEntity;
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
+@BusinessRule
 public interface AssignmentRule {
     
     boolean canPrepareOrder(String operator, OrderEntity order);
