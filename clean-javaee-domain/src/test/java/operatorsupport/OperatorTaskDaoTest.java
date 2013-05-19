@@ -32,7 +32,7 @@ public class OperatorTaskDaoTest {
     }
     
     @Test
-    public void schouldReturnSequenceForMichalWhenOneSimpleSequenceExists() {
+    public void shouldReturnSequenceForMichalWhenOneSimpleSequenceExists() {
         // given
         String operator = "michal";
         OrderKey[] expectedOrderProcessingSequence = {
@@ -51,7 +51,7 @@ public class OperatorTaskDaoTest {
     }
     
     @Test
-    public void schouldReturnEmptySequenceWhenNoSequenceIsDefinedForGivenOperator() {
+    public void shouldReturnEmptySequenceWhenNoSequenceIsDefinedForGivenOperator() {
         // given
         String operator = "michal";
         String otherOperator = "krzysztof";
@@ -68,7 +68,7 @@ public class OperatorTaskDaoTest {
     }
     
     @Test
-    public void schouldReturnSequenceForCorrectOperatorWhenNoSequenceIsDefinedForGivenOperator() {
+    public void shouldReturnSequenceForCorrectOperatorWhenNoSequenceIsDefinedForGivenOperator() {
         // given
         String operator = "michal";
         String otherOperator = "krzysztof";

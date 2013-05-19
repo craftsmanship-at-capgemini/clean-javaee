@@ -1,6 +1,3 @@
-/**
- * 
- */
 package orderprocessing.scheduling;
 
 import static orderprocessing.OrderBuilder.anOrder;

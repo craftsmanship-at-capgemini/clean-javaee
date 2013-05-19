@@ -23,7 +23,7 @@ public class OrderBuilder {
     private Date creationTime;
     private Set<OrderLineEntity> orderLines = new HashSet<OrderLineEntity>();
     
-    static public OrderBuilder anOrder() {
+    public static OrderBuilder anOrder() {
         return new OrderBuilder();
     }
     
