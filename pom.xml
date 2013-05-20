@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>craftsmanship-at-capgemini</groupId>
-        <artifactId>common-build</artifactId>
-        <version>1.0-RC1</version>
-        <relativePath>parent-pom.xml</relativePath>
-    </parent>
+    <groupId>craftsmanship-at-capgemini</groupId>
     <artifactId>clean-javaee</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Example of clean &amp; testable Java EE application</name>
     <modules>
@@ -28,6 +24,252 @@
         <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
         <tag>master</tag>
     </scm>
+    <organization />
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+            <comments>A free of charge, business-friendly, open-source software license</comments>
+        </license>
+    </licenses>
+    <inceptionYear>2012</inceptionYear>
+    <developers>
+        <developer>
+            <id>1</id>
+            <name>Michal Michaluk</name>
+            <timezone>2</timezone>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.spec</groupId>
+            <artifactId>jboss-javaee-all-6.0</artifactId>
+            <version>3.0.2.Final</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <!-- version 2.4 is not compatible with the mavenarchiver plugin for m2e : https://github.com/sonatype/m2eclipse-extras/issues/10 -->
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ejb-plugin</artifactId>
+                    <version>2.3</version>
+                    <configuration>
+                        <ejbVersion>3.1</ejbVersion>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.2</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>2.7</version>
+                    <configuration>
+                        <version>6</version>
+                        <defaultLibBundleDir>lib</defaultLibBundleDir>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.11</version>
+                    <configuration>
+                        <parallel>methods</parallel>
+                        <threadCount>4</threadCount>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.0</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependency-updates-report</report>
+                            <report>property-updates-report</report>
+                            <report>plugin-updates-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>dashboard-maven-plugin</artifactId>
+                <version>1.0.0-beta-1</version>
+            </plugin>
+        </plugins>
+    </reporting>
+    <profiles>
+        <profile>
+            <id>openshift</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-ear-plugin</artifactId>
+                            <version>2.7</version>
+                            <configuration>
+                                <outputDirectory>deployments</outputDirectory>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-war-plugin</artifactId>
+                            <version>2.3</version>
+                            <configuration>
+                                <outputDirectory>deployments</outputDirectory>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>local.glassfish</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>1.2</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-property</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>glassfish.autodeploy.path</property>
+                                            <message>You must set a glassfish.autodeploy.path property in your settings.xml</message>
+                                        </requireProperty>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-ear-plugin</artifactId>
+                            <version>2.7</version>
+                            <configuration>
+                                <outputDirectory>${glassfish.autodeploy.path}</outputDirectory>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-war-plugin</artifactId>
+                            <version>2.3</version>
+                            <configuration>
+                                <outputDirectory>${glassfish.autodeploy.path}</outputDirectory>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
     <repositories>
         <repository>
             <id>github-releases</id>
@@ -49,22 +291,26 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>EclipseLink</id>
+            <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
+        </repository>
+        <repository>
+            <id>prime-repo</id>
+            <name>PrimeFaces Maven Repository</name>
+            <url>http://repository.primefaces.org</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>jboss-thirdparty-releases</id>
+            <name>JBoss Thirdparty Releases</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
+        </repository>
     </repositories>
-    <organization />
-    <licenses>
-        <license>
-            <name>The MIT License</name>
-            <url>http://opensource.org/licenses/MIT</url>
-            <distribution>repo</distribution>
-            <comments>A free of charge, business-friendly, open-source software license</comments>
-        </license>
-    </licenses>
-    <inceptionYear>2012</inceptionYear>
-    <developers>
-        <developer>
-            <id>1</id>
-            <name>Michal Michaluk</name>
-            <timezone>2</timezone>
-        </developer>
-    </developers>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Codehaus repository</id>
+            <url>http://repository.codehaus.org/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
