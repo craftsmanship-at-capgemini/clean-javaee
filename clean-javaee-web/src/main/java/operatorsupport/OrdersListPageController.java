@@ -36,8 +36,8 @@ public class OrdersListPageController {
         return new Outcome(OrdersListPageController.class).build();
     }
     
-    @EJB OrderProgressManagementRemote orderProgressManagement;
-    @EJB OperatorTasksRemote operatorTasks;
+    @EJB(mappedName="orderProgressManagement") OrderProgressManagementRemote orderProgressManagement;
+    @EJB(mappedName="operatorTasks") OperatorTasksRemote operatorTasks;
     
     @Inject @Messages Collection<FacesMessage> messages;
     @Inject OperatorsupportI18n i18n;

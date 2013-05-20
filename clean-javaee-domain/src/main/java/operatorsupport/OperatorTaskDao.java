@@ -17,7 +17,7 @@ import persistence.QueryParamBuilder;
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  * 
  */
-@Stateless
+@Stateless(mappedName="operatorTasks")
 @LocalBean
 @DataAccessObject
 public class OperatorTaskDao implements OperatorTasksRemote {

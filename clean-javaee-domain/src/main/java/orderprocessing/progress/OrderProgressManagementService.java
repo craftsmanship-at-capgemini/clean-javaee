@@ -31,7 +31,7 @@ import persistence.NotFoundException;
  * 
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
-@Stateless
+@Stateless(mappedName="orderProgressManagement")
 @LocalBean
 public class OrderProgressManagementService implements OrderProgressManagementRemote {
     
