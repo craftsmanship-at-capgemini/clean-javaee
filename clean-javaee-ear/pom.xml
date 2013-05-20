@@ -16,6 +16,12 @@
             <version>1.0.0-SNAPSHOT</version>
             <type>ejb</type>
         </dependency>
+        <dependency>
+            <groupId>craftsmanship-at-capgemini</groupId>
+            <artifactId>clean-javaee-web</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -28,6 +34,10 @@
                             <groupId>craftsmanship-at-capgemini</groupId>
                             <artifactId>clean-javaee-domain</artifactId>
                         </ejbModule>
+                        <webModule>
+                            <groupId>craftsmanship-at-capgemini</groupId>
+                            <artifactId>clean-javaee-web</artifactId>
+                        </webModule>
                     </modules>
                 </configuration>
             </plugin>

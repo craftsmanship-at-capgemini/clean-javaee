@@ -97,12 +97,12 @@ public class ConfigurationFactory {
     
     @Produces
     @Configuration
-    Properties createClasspathProperties() {
+    static Properties createClasspathProperties() {
         String file = "/orderprocessing.scheduling.utils.ConfigurationFactory.properties";
         Properties properties = new Properties();
         try {
             InputStream input =
-                    getClass().getResourceAsStream(file);
+                ConfigurationFactory.class.getResourceAsStream(file);
             properties.load(input);
         } catch (IOException e) {
             throw new AssertionError(e);
