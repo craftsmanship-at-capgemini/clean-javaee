@@ -16,5 +16,11 @@
             <version>1.0-RC1</version>
             <scope>test</scope>
         </dependency>
+        <!-- Domain projects dependencies -->
+        <dependency>
+            <groupId>craftsmanship-at-capgemini</groupId>
+            <artifactId>shared-api</artifactId>
+            <version>1.0-RC1</version>
+        </dependency>
     </dependencies>
 </project>
