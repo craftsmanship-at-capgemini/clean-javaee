@@ -4,7 +4,7 @@
     <parent>
         <groupId>craftsmanship-at-capgemini</groupId>
         <artifactId>clean-javaee</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>clean-javaee-domain</artifactId>
     <name>clean-javaee domain module</name>
@@ -14,24 +14,24 @@
         <dependency>
             <groupId>eternity</groupId>
             <artifactId>common-testing</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>eternity</groupId>
             <artifactId>common-persistence</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>eternity</groupId>
             <artifactId>common-server</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <!-- Domain projects dependencies -->
         <dependency>
             <groupId>craftsmanship-at-capgemini</groupId>
             <artifactId>clean-javaee-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

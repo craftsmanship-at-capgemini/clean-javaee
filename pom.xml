@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>craftsmanship-at-capgemini</groupId>
     <artifactId>clean-javaee</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>Example of clean &amp; testable Java EE application</name>
     <modules>
@@ -22,7 +22,7 @@
         <connection>https://github.com/craftsmanship-at-capgemini/clean-javaee.git</connection>
         <developerConnection>scm:git:git@github.com:craftsmanship-at-capgemini/clean-javaee.git</developerConnection>
         <url>https://github.com/craftsmanship-at-capgemini/clean-javaee</url>
-        <tag>master</tag>
+        <tag>clean-javaee-1.0.0</tag>
     </scm>
     <organization />
     <licenses>
