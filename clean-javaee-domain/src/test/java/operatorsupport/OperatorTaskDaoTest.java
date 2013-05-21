@@ -24,7 +24,7 @@ public class OperatorTaskDaoTest {
     
     @Rule public TestingPersistenceUnit persistenceUnit = new TestingPersistenceUnit("clean-javaee-test-db");
     
-    @Inject OperatorTaskDao operatorTaskDaoUnderTest;
+    @Inject OperatorTasksDao operatorTasksDaoUnderTest;
     
     @Before
     public void setUp() throws Exception {
@@ -44,7 +44,7 @@ public class OperatorTaskDaoTest {
                 anOrderProcessingSequence(operator).
                         withOrders(expectedOrderProcessingSequence).build());
         // when
-        List<OrderKey> actualOrderProcessingSequence = operatorTaskDaoUnderTest.getOrderSequence(operator);
+        List<OrderKey> actualOrderProcessingSequence = operatorTasksDaoUnderTest.getOrderSequence(operator);
         
         // then
         assertThat(actualOrderProcessingSequence).containsExactly(expectedOrderProcessingSequence);
@@ -61,7 +61,7 @@ public class OperatorTaskDaoTest {
                         withSomeOrders().build());
         
         // when
-        List<OrderKey> actualOrderProcessingSequence = operatorTaskDaoUnderTest.getOrderSequence(operator);
+        List<OrderKey> actualOrderProcessingSequence = operatorTasksDaoUnderTest.getOrderSequence(operator);
         
         // then
         assertThat(actualOrderProcessingSequence).isEmpty();
@@ -84,7 +84,7 @@ public class OperatorTaskDaoTest {
                         withSomeOrders().build());
         
         // when
-        List<OrderKey> actualOrderProcessingSequence = operatorTaskDaoUnderTest.getOrderSequence(operator);
+        List<OrderKey> actualOrderProcessingSequence = operatorTasksDaoUnderTest.getOrderSequence(operator);
         
         // then
         assertThat(actualOrderProcessingSequence).containsExactly(expectedOrderProcessingSequence);

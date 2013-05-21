@@ -20,7 +20,7 @@ import persistence.QueryParamBuilder;
 @Stateless(mappedName="operatorTasks")
 @LocalBean
 @DataAccessObject
-public class OperatorTaskDao implements OperatorTasksRemote {
+public class OperatorTasksDao implements OperatorTasksRemote {
     
     @PersistenceContext private EntityManager entityManager;
     
