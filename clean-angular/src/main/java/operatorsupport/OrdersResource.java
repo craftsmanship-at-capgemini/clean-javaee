@@ -1,11 +1,9 @@
 package operatorsupport;
 
-import java.io.StringWriter;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
-import javax.json.JsonWriter;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
@@ -19,6 +17,7 @@ import static orderprocessing.OrderState.PROCESSED;
 import static orderprocessing.OrderState.SCHEDULED;
 import persistence.EntityManagerHelper;
 import persistence.QueryParamBuilder;
+import util.JsonUtils;
 
 /**
  *
@@ -43,8 +42,6 @@ public class OrdersResource {
      * }
      * </pre>
      *
-     * @param operator
-     * @return
      */
     @GET
     @Path("/{operator}")
@@ -53,7 +50,8 @@ public class OrdersResource {
         List<OrderEntity> orders = EntityManagerHelper.findMany(entityManager, OrderEntity.class,
                 "select distinct o from OrderEntity o join fetch OrderLineEntity ol "
                 + "join SequenceElementEntity se on o.orderKey = se.orderKey "
-                + "where se.operator = :operator and o.orderState in (:scheduled, :processed) order by se.sequenceNumber",
+                + "where se.operator = :operator and o.orderState in (:scheduled, :processed)"
+                + "order by se.sequenceNumber",
                 QueryParamBuilder.withParams(3).param("operator", operator)
                 .param("scheduled", SCHEDULED).param("processed", PROCESSED));
 
@@ -73,15 +71,7 @@ public class OrdersResource {
                     .add("products", productsJson)
             );
         }
-        return asJsonString(ordersJson);
-    }
-
-    private String asJsonString(JsonArrayBuilder ordersJson) {
-        StringWriter stWriter = new StringWriter();
-        try (JsonWriter jsonWriter = Json.createWriter(stWriter)) {
-            jsonWriter.writeArray(ordersJson.build());
-        }
-        return stWriter.toString();
+        return JsonUtils.asJsonString(ordersJson);
     }
 
     private String mapState(OrderState state) {
@@ -91,7 +81,7 @@ public class OrdersResource {
             case PROCESSED:
                 return "done";
             default:
-                throw new AssertionError(state.name());
+                throw new AssertionError("Order with wrong state '" + state + "' selected from database");
         }
     }
 
