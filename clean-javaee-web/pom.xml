@@ -9,6 +9,17 @@
     <artifactId>clean-javaee-web</artifactId>
     <packaging>war</packaging>
     <name>clean-javaee web application</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warName>clean-javaee-web</warName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
         <!-- Common projects dependencies -->
         <dependency>
@@ -27,12 +38,6 @@
             <groupId>craftsmanship-at-capgemini</groupId>
             <artifactId>clean-javaee-api</artifactId>
             <version>1.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>craftsmanship-at-capgemini</groupId>
-            <artifactId>clean-javaee-domain</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
-            <type>ejb</type>
             <scope>provided</scope>
         </dependency>
         <dependency>

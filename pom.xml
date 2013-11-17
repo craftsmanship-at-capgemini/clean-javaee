@@ -85,8 +85,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.5.1</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
@@ -129,8 +129,6 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                         </archive>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
@@ -145,8 +143,6 @@
                         <defaultLibBundleDir>lib</defaultLibBundleDir>
                         <archive>
                             <manifest>
-                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                         </archive>
                     </configuration>
@@ -209,20 +205,12 @@
                                 <outputDirectory>deployments</outputDirectory>
                             </configuration>
                         </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-war-plugin</artifactId>
-                            <version>2.3</version>
-                            <configuration>
-                                <outputDirectory>deployments</outputDirectory>
-                            </configuration>
-                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
         </profile>
         <profile>
-            <id>local.glassfish</id>
+            <id>localhost</id>
             <build>
                 <plugins>
                     <plugin>
@@ -238,8 +226,8 @@
                                 <configuration>
                                     <rules>
                                         <requireProperty>
-                                            <property>glassfish.autodeploy.path</property>
-                                            <message>You must set a glassfish.autodeploy.path property in your settings.xml</message>
+                                            <property>local.deployments.path</property>
+                                            <message>You must set a local.deployments.path property in your settings.xml</message>
                                         </requireProperty>
                                     </rules>
                                     <fail>true</fail>
@@ -254,15 +242,7 @@
                             <artifactId>maven-ear-plugin</artifactId>
                             <version>2.7</version>
                             <configuration>
-                                <outputDirectory>${glassfish.autodeploy.path}</outputDirectory>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-war-plugin</artifactId>
-                            <version>2.3</version>
-                            <configuration>
-                                <outputDirectory>${glassfish.autodeploy.path}</outputDirectory>
+                                <outputDirectory>${local.deployments.path}</outputDirectory>
                             </configuration>
                         </plugin>
                     </plugins>
