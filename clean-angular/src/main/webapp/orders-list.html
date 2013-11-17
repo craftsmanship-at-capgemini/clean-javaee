@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" ng-app="ordersListApp">
+    <head>
+        <meta charset="utf-8">
+        <title>Clean JavaEE with AngularJS</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <link rel="stylesheet" href="css/app.css"/>
+        <link rel="stylesheet" href="css/orders-list.css"/>
+    </head>
+    <body>
+
+        <article ng-controller="OrdersListCtrl">
+            <div ng-repeat="order in orders" bindonce
+                 ng-class="[order.state, 'order']"
+                 ng-click="processOrder(order)">
+                <h1 data-bo-text="order.key"></h1>
+                <h2 ng-bind="order.state"></h2>
+                <table class="products" ng-show="order.showProductsList">
+                    <colgroup>
+                        <col class="product-count">
+                        <col class="product">
+                    </colgroup>
+                    <tr ng-repeat="product in order.products"
+                        ng-show="product.showProduct"
+                        ng-click="productPrepared(order, product);
+                                        $event.stopPropagation()">
+                        <td ng-bind="product.done + ' / ' + product.qty"></td>
+                        <td ng-class="{'done':product.isDone}" data-bo-text="product.key"></td>
+                    </tr>
+                </table>
+            </div>
+        </article>
+        <script src="lib/angular/angular.js"></script>
+        <script src="lib/angular/angular-touch.js"></script>
+        <script src="lib/angular/angular-resource.js"></script>
+        <script src="lib/bindonce.js"></script>
+        <script src="js/orders-list.js"></script>
+    </body>
+</html>

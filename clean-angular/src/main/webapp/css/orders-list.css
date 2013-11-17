@@ -1,0 +1,59 @@
+
+.order {
+    border: 1px solid black;
+    margin: 5px 0;
+    padding: 5px;
+    border-color: lightgray;
+    border-radius: 2px;
+    border-style: dashed;
+}
+
+.order > h1 {
+    display: inline;
+    font-size: 140%;
+    font-weight: lighter;
+    margin: 0;
+}
+
+.order > h2 {
+    display: inline;
+    float: right;
+    font-size: 100%;
+    font-weight: lighter;
+    margin: 0;
+}
+
+.order.done > h2, .order table.products .done {
+    color: greenyellow;
+}
+
+.order.uncompleted > h2 {
+    color: red;
+}
+
+.order.in-progress > h2 {
+    color: orange;
+}
+
+.order.todo > h2 {
+    color: black;
+}
+
+.order table.products {
+    font-size: 120%;
+    width: 100%;
+}
+
+.order table.products td {
+    padding-bottom: 7px;
+}
+
+.order table.products col.product-count {
+    width: 2em;
+}
+td:first-child {
+    text-align: right;
+}
+
+.order table.products col.product {
+}
