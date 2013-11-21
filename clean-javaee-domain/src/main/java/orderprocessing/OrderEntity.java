@@ -1,14 +1,14 @@
 package orderprocessing;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,75 +24,86 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
- * 
+ *
  * @author Michal Michaluk <michaluk.michal@gmail.com>
  */
 @Entity
 @Table(name = "Orders")
 public class OrderEntity implements Serializable {
-    
+
     private static final long serialVersionUID = 1599682747342086056L;
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) protected long id;
-    @Version protected int version;
-    
-    @Embedded @NotNull @Valid protected OrderKey orderKey;
-    @Enumerated @NotNull protected OrderState orderState;
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER) @NotNull//
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    protected long id;
+    @Version
+    protected int version;
+
+    @Embedded
+    @NotNull
+    @Valid
+    protected OrderKey orderKey;
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    protected OrderState orderState;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @NotNull//
     protected CustomerEntity customer;
-    @Temporal(TemporalType.TIMESTAMP) @NotNull protected Date creationTime;
-    
+    @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
+    protected Calendar creationTime;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)//
     protected Set<OrderLineEntity> orderLines = new HashSet<OrderLineEntity>();
-    
+
     protected OrderEntity() {
     }
-    
+
     public OrderKey getOrderKey() {
         return orderKey;
     }
-    
+
     public OrderState getOrderState() {
         return orderState;
     }
-    
+
     public Set<OrderLineEntity> getOrderLines() {
         return Collections.unmodifiableSet(orderLines);
     }
-    
+
     public void markAsScheduled() {
-        if (orderState == OrderState.OPEN ||
-                orderState == OrderState.SCHEDULED) {
+        if (orderState == OrderState.OPEN
+                || orderState == OrderState.SCHEDULED) {
             orderState = OrderState.SCHEDULED;
             // e.g. log info to auditing database
         } else {
-            throw new IllegalStateException("Order state transition: " +
-                    orderState + " -> " + OrderState.SCHEDULED +
-                    " is illegal");
+            throw new IllegalStateException("Order state transition: "
+                    + orderState + " -> " + OrderState.SCHEDULED
+                    + " is illegal");
         }
     }
-    
+
     public void markAsProcessed() {
         if (orderState == OrderState.SCHEDULED) {
             orderState = OrderState.PROCESSED;
             // e.g. log info to auditing database
         } else {
-            throw new IllegalStateException("Order state transition: " +
-                    orderState + " -> " + OrderState.PROCESSED +
-                    " is illegal");
+            throw new IllegalStateException("Order state transition: "
+                    + orderState + " -> " + OrderState.PROCESSED
+                    + " is illegal");
         }
     }
-    
+
     public void markAsClosed() {
         if (orderState == OrderState.PROCESSED) {
             orderState = OrderState.CLOSED;
             // e.g. log info to auditing database
         } else {
-            throw new IllegalStateException("Order state transition: " +
-                    orderState + " -> " + OrderState.CLOSED +
-                    " is illegal");
+            throw new IllegalStateException("Order state transition: "
+                    + orderState + " -> " + OrderState.CLOSED
+                    + " is illegal");
         }
     }
-    
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -109,7 +120,7 @@ public class OrderEntity implements Serializable {
         builder.append("]");
         return builder.toString();
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -121,7 +132,7 @@ public class OrderEntity implements Serializable {
         result = prime * result + version;
         return result;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

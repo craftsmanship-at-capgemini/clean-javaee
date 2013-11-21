@@ -48,9 +48,9 @@ public class OrdersResource {
     @Produces("application/json")
     public String getOrders(@PathParam("operator") String operator) {
         List<OrderEntity> orders = EntityManagerHelper.findMany(entityManager, OrderEntity.class,
-                "select distinct o from OrderEntity o join fetch OrderLineEntity ol "
-                + "join SequenceElementEntity se on o.orderKey = se.orderKey "
-                + "where se.operator = :operator and o.orderState in (:scheduled, :processed)"
+                "select distinct o from OrderEntity o join fetch o.rderLineEntity ol "
+                + "join SequenceElementEntity se on (o.orderKey = se.orderKey) "
+                + "where se.operator = :operator and o.orderState in (:scheduled, :processed) "
                 + "order by se.sequenceNumber",
                 QueryParamBuilder.withParams(3).param("operator", operator)
                 .param("scheduled", SCHEDULED).param("processed", PROCESSED));

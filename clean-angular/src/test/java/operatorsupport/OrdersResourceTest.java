@@ -68,6 +68,7 @@ public class OrdersResourceTest {
         // when
         String json = ordersResourceUnderTest.getOrders(operator);
 
+        // then
         JsonArrayBuilder expectedJsonObjects = Json.createArrayBuilder();
         expectedJsonObjects.add(Json.createObjectBuilder()
                 .add("key", "123456789/A1/2013")
