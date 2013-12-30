@@ -1,23 +1,12 @@
 package operatorsupport;
 
-import java.util.List;
 import javax.enterprise.context.RequestScoped;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import orderprocessing.OrderEntity;
-import orderprocessing.OrderLineEntity;
-import orderprocessing.OrderState;
-import static orderprocessing.OrderState.PROCESSED;
-import static orderprocessing.OrderState.SCHEDULED;
-import persistence.EntityManagerHelper;
-import persistence.QueryParamBuilder;
-import util.JsonUtils;
 
 /**
  *
@@ -32,6 +21,7 @@ public class OrdersResource {
 
     /**
      * <pre>
+     * [
      * {
      * "key": "123456789/A1/2013",
      * "state": "todo",
@@ -39,7 +29,16 @@ public class OrdersResource {
      * {"key": "ksr-14-378", "done":0, "qty":1},
      * {"key": "jre-07-666", "done":0, "qty":2}
      * ]
+     * },
+     * {
+     * "key": "564738291/A1/2013",
+     * "state": "done",
+     * "products": [
+     * {"key": "ksr-14-378", "done":1, "qty":1},
+     * {"key": "jre-07-666", "done":2, "qty":2}
+     * ]
      * }
+     * ]
      * </pre>
      *
      */
@@ -47,42 +46,33 @@ public class OrdersResource {
     @Path("/{operator}")
     @Produces("application/json")
     public String getOrders(@PathParam("operator") String operator) {
-        List<OrderEntity> orders = EntityManagerHelper.findMany(entityManager, OrderEntity.class,
-                "select distinct o from OrderEntity o join fetch o.rderLineEntity ol "
-                + "join SequenceElementEntity se on (o.orderKey = se.orderKey) "
-                + "where se.operator = :operator and o.orderState in (:scheduled, :processed) "
-                + "order by se.sequenceNumber",
-                QueryParamBuilder.withParams(3).param("operator", operator)
-                .param("scheduled", SCHEDULED).param("processed", PROCESSED));
-
-        JsonArrayBuilder ordersJson = Json.createArrayBuilder();
-        for (OrderEntity order : orders) {
-            JsonArrayBuilder productsJson = Json.createArrayBuilder();
-            for (OrderLineEntity orderLine : order.getOrderLines()) {
-                productsJson.add(Json.createObjectBuilder()
-                        .add("key", orderLine.getItemKey().toString())
-                        .add("done", 0)
-                        .add("qty", orderLine.getQuantity())
-                );
-            }
-            ordersJson.add(Json.createObjectBuilder()
-                    .add("key", order.getOrderKey().toString())
-                    .add("state", mapState(order.getOrderState()))
-                    .add("products", productsJson)
-            );
-        }
-        return JsonUtils.asJsonString(ordersJson);
-    }
-
-    private String mapState(OrderState state) {
-        switch (state) {
-            case SCHEDULED:
-                return "todo";
-            case PROCESSED:
-                return "done";
-            default:
-                throw new AssertionError("Order with wrong state '" + state + "' selected from database");
-        }
+        String query = ""
+                + "select coalesce(cast(array_to_json(array_agg(row_to_json(orders.*))) as varchar), '[]') "
+                + "from "
+                + "( "
+                + "  select "
+                + "    o.key||'/'||o.category||'/'||o.year as key, "
+                + "    case "
+                + "      when orderstate = 'PROCESSED' then 'done' "
+                + "      when orderstate = 'SCHEDULED' then 'todo' "
+                + "    end as state, "
+                + "    ( "
+                + "      select array_to_json(array_agg(row_to_json(products.*))) "
+                + "      from "
+                + "      ("
+                + "        select itemkey as key, 0 as done, quantity as qty "
+                + "        from orderlines where orderlines.order_id = o.id "
+                + "      ) as products "
+                + "    ) as products "
+                + "  from orders as o join sequenceelements as se "
+                + "    on (o.key,o.category,o.year) = (se.key,se.category,se.year) "
+                + "  where o.orderState in ('SCHEDULED','PROCESSED') and operator = :operator "
+                + "  order by se.sequenceNumber "
+                + ") as orders(key, state, products) ";
+        String json = entityManager.createNativeQuery(query)
+                .setParameter("operator", operator)
+                .getSingleResult().toString();
+        return json;
     }
 
 }

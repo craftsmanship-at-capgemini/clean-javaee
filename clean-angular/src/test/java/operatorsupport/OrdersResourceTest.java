@@ -11,6 +11,7 @@ import orderprocessing.OrderKey;
 import static orderprocessing.OrderSequenceBuilder.anOrderProcessingSequence;
 import orderprocessing.OrderState;
 import static org.fest.assertions.api.Assertions.assertThat;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,6 +33,11 @@ public class OrdersResourceTest {
 
     @Before
     public void setUp() throws Exception {
+        String testDBProfile = System.getProperty("testing.persistence.test-db-profile");
+        Assume.assumeTrue("test supports only postgresql database "
+                + "(mvn ... -Dtesting.persistence.test-db-profile=postgresql)",
+                "postgresql".equals(testDBProfile));
+
         Testing.inject(this);
     }
 
