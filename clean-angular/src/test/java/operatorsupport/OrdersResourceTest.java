@@ -31,9 +31,9 @@ public class OrdersResourceTest {
     @Before
     public void setUp() throws Exception {
         String testDBProfile = System.getProperty("testing.persistence.test-db-profile");
-        Assume.assumeTrue("test supports only postgresql database "
-                + "(mvn ... -Dtesting.persistence.test-db-profile=postgresql)",
-                "postgresql".equals(testDBProfile));
+        Assume.assumeNotNull("test supports only postgresql database and will be ignored in default profile "
+                + "(run mvn ... -Dtesting.persistence.test-db-profile=postgresql)",
+                testDBProfile);
 
         Testing.inject(this);
     }
