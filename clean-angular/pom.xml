@@ -19,19 +19,36 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.kelveden</groupId>
-                <artifactId>maven-karma-plugin</artifactId>
-                <version>1.5</version>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <version>1.3.1.3</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>start</goal>
+                            <goal>test</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <configFile>${basedir}/src/test/resources/karma.conf.js</configFile>
-                    <browsers>PhantomJS</browsers>
+                    <jsSrcDir>${project.basedir}/src/main/webapp/</jsSrcDir>
+                    <preloadSources>
+                        <preloadSource>http://code.jquery.com/jquery-1.9.1.js</preloadSource>
+                    </preloadSources>
+                    <sourceIncludes>
+                        <include>lib/angular/angular.js</include>
+                        <include>lib/**/*.js</include>
+                        <include>js/**/*.js</include>
+                    </sourceIncludes>
+                    <sourceExcludes>
+                        <exclude>lib/angular/angular-loader.js</exclude>
+                        <exclude>lib/angular/*.min.js</exclude>
+                    </sourceExcludes>
+                    <jsTestSrcDir>${project.basedir}/src/test/resources/</jsTestSrcDir>
+                    <specIncludes>
+                        <include>lib/**/**.js</include>
+                        <include>unit/**/*.js</include>
+                    </specIncludes>
+                    <junitXmlReportFileName>TEST-${project.artifactId}.xml</junitXmlReportFileName>
                 </configuration>
             </plugin>
         </plugins>
